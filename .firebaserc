@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "cinefolio-f4969"
+  },
+  "targets": {
+    "cinefolio-f4969": {
+      "hosting": {
+        "javascripter": [
+          "javascripter"
+        ]
+      }
+    }
+  }
+}
