@@ -1,16 +1,17 @@
 <script>
-    export let thumbnail;
+    export let thumb;
     export let alt;
     export let title;
-    export let content;
+	export let content;
+	export let link;
 </script>
 
-<div class="slide">
+<div class="slide" on:click={() => { window.open(link, '_black'); }}>
     <div class="frame-container">
-        <img src={thumbnail} class="thumbnail" alt={alt}/>
+        <img src={thumb} class="thumbnail" alt={alt}/>
     </div>
     <div class="text-container noselect">
-        <h3>{title}</h3><br>
+        <div class="text-title">{title}</div>
         {content}
     </div>
 </div>
@@ -25,7 +26,6 @@
 
     .slide {
 		width: 38em;
-    	height: 9.5em;
 		padding: 0.5em 1em 0.5em 0.7em;
 	}
 
@@ -45,13 +45,28 @@
 		margin-right: 0.6em;
     }
 
+	.text-title {
+		font-size: 1.17em;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		font-weight: 700;
+	}
+
     @media screen and (max-width: 39em) {
 		.slide {
             width: 17em;
         }
 
 		.text-container {
-			display: none;
+			display: block;
+    		position: relative;
+			text-align: center;
+		}
+
+		.text-title {
+			margin-top: 0.4em;
+			margin-bottom: 0.4em;
+			text-align: center;
 		}
 	}
 </style>

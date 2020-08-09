@@ -1,10 +1,13 @@
 <script>
+    import { goto } from '@sveltech/routify'
+    
     export let title = '';
     export let number = '';
     export let content = '';
+    export let where = '';
 </script>
 
-<div class="footer-snap noselect">
+<div class="footer-snap noselect" on:click={$goto('/' + where)}>
     <div class="snap-title">{title}</div>
     <div class="snap-number center-vh">{number}</div>
     <div class="snap-content">{content}</div>
@@ -24,7 +27,7 @@
     }
 
     .snap-title {
-        padding: 0.5em 0.3em 0.3em 0.3em;
+        padding: 0.8em 0.3em 0.3em 0.3em;
         text-align: center;
         font-size: 1.1em;
         font-weight: 300;
@@ -40,7 +43,7 @@
 
     .snap-content {
         position: absolute;
-        bottom: 0.5em;
+        bottom: 0.8em;
         width: 100%;
         text-align: center;
         font-weight: 300;
