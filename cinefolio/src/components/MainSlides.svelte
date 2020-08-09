@@ -1,15 +1,18 @@
 <script>
-	import Slide from './Slide.svelte';
+    import { collectionData } from 'rxfire/firestore';
+    import { startWith } from 'rxjs/operators';
+    import { db } from './../js/firebase';
+    import Slide from './../components/Slide.svelte';
+
+    const query = db.collection('Videos').orderBy('timestamp', 'desc').limit(1);
+    const videos = collectionData(query).pipe(startWith([]));
 </script>
 
 <div id="main-container">
 	<div class="center-vh">
-		<Slide 
-			thumbnail='http://i3.ytimg.com/vi/uOulc9dy69I/maxresdefault.jpg'
-			alt="volumetrics"
-			title='Ultimate Volumetrics Guide in Blender'
-			content='We dive deep into the volumetrics optimizations that can be done inside Blender.'
-		/>
+		{#each $videos as video}
+			<Slide {...video} />
+		{/each}
 	</div>
 </div>
 
