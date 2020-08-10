@@ -4,6 +4,7 @@
     export let title;
 	export let content;
 	export let link;
+	export let timestamp;
 </script>
 
 <div class="slide" on:click={() => { window.open(link, '_black'); }}>
@@ -25,12 +26,14 @@
     }
 
     .slide {
+		display: flex;
 		width: 38em;
 		padding: 0.5em 1em 0.5em 0.7em;
+    	border-radius: 0.2em;
 	}
 
 	.slide:hover {
-		background-color: rgba(0, 0, 0, 0.4);
+		background-color: rgba(0, 0, 0, 0.2);
 	}
 
 	.frame-container {
@@ -40,9 +43,8 @@
 
 	.text-container {
 		display: inline-block;
-		position: absolute;
-		top: 0%;
 		margin-right: 0.6em;
+		width: calc(100% - 18em);
     }
 
 	.text-title {
@@ -54,6 +56,7 @@
 
     @media screen and (max-width: 39em) {
 		.slide {
+			display: block;
             width: 17em;
         }
 
@@ -61,6 +64,7 @@
 			display: block;
     		position: relative;
 			text-align: center;
+			width: inherit;
 		}
 
 		.text-title {

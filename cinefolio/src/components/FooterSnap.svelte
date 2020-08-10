@@ -1,4 +1,5 @@
 <script>
+    import Card, { PrimaryAction } from '@smui/card';
     import { goto } from '@sveltech/routify'
     
     export let title = '';
@@ -7,22 +8,31 @@
     export let where = '';
 </script>
 
-<div class="footer-snap noselect" on:click={$goto('/' + where)}>
-    <div class="snap-title">{title}</div>
-    <div class="snap-number center-vh">{number}</div>
-    <div class="snap-content">{content}</div>
-    <slot></slot>
+<div class="footer-snap">
+    <Card>
+        <PrimaryAction on:click={$goto('/' + where)}>
+            <div class="footer-snap-content noselect">
+                <div class="snap-title">{title}</div>
+                <div class="snap-number center-vh">{number}</div>
+                <div class="snap-content">{content}</div>
+                <slot></slot>
+            </div>
+        </PrimaryAction>
+    </Card>
 </div>
 
 <style>
     .footer-snap {
-        position: relative;
-		height: 10em;
-		width: 12em;
 		margin: 0em 1em;
     }
     
-    .footer-snap:hover {
+    .footer-snap-content {
+        position: relative;
+		height: 10em;
+		width: 12em;
+    }
+    
+    .footer-snap-content:hover {
 		background-color: rgba(255, 255, 255, 0.05);
     }
 
