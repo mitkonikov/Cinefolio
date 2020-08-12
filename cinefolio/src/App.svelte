@@ -1,5 +1,5 @@
 <script>
-	import { Router } from "@sveltech/routify";
+	import { Router ,goto } from "@sveltech/routify";
   	import { routes } from "@sveltech/routify/tmp/routes";
 
 	import './theme/common.scss';
@@ -11,7 +11,7 @@
 	
 	<Router {routes} />
 
-	<div id="name-tag" class="noselect">
+	<div id="name-tag" class="noselect" on:click={() => { window.location.href = window.location.origin; }}>
 		<div id="name">Mitko Nikov</div>
 		<div id="coder">CODER</div>
 	</div>
