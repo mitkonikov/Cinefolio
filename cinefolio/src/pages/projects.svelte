@@ -4,12 +4,30 @@
     import { db } from './../js/firebase';
     import Slide from './../components/Slide.svelte';
 
-    const query = db.collection('Projects').orderBy('rank', 'desc');
+    const query = db.collection('Projects').orderBy('rank', 'desc').limit(5);
     const projects = collectionData(query).pipe(startWith([]));
 </script>
 
-<div class="center-vh">
-    {#each $projects as project}
-        <Slide {...project}/>
-    {/each}
+<div id="project-container-center">
+    <div id="project-container">
+        {#each $projects as project}
+            <Slide {...project}/>
+        {/each}
+    </div>
 </div>
+
+<style>
+    #project-container-center {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+    }
+
+    #project-container {
+        position: relative;
+        margin: auto;
+        width: fit-content;
+        margin-top: 8em;
+    }
+</style>
