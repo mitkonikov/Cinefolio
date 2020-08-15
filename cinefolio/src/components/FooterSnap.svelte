@@ -44,7 +44,6 @@
     }
 
     .snap-number {
-        position: absolute;
         text-align: center;
         font-size: 2.5em;
         font-weight: 700;

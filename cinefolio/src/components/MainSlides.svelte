@@ -27,7 +27,7 @@
 
     @media screen and (max-width: 39em) {
         #main-container {
-		    height: 100%;
+		height: calc(100% - 13em);
         }
 	}
 </style>
