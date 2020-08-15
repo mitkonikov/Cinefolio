@@ -4,7 +4,6 @@
     
     export let title = '';
     export let number = '';
-    export let content = '';
     export let where = '';
 </script>
 
@@ -12,9 +11,8 @@
     <Card>
         <PrimaryAction on:click={$goto('/' + where)}>
             <div class="footer-snap-content noselect">
+                <div class="snap-number">{number}</div>
                 <div class="snap-title">{title}</div>
-                <div class="snap-number center-vh">{number}</div>
-                <div class="snap-content">{content}</div>
                 <slot></slot>
             </div>
         </PrimaryAction>
@@ -23,13 +21,14 @@
 
 <style>
     .footer-snap {
-		margin: 0em 1em;
+        padding: 0.5em 6%;
     }
     
     .footer-snap-content {
         position: relative;
-		height: 10em;
-		width: 12em;
+		height: 2.7em;
+        padding: 0.2em;
+        text-align: center;
     }
     
     .footer-snap-content:hover {
@@ -37,6 +36,7 @@
     }
 
     .snap-title {
+        display: inline-block;
         padding: 0.8em 0.3em 0.3em 0.3em;
         text-align: center;
         font-size: 1.1em;
@@ -44,17 +44,10 @@
     }
 
     .snap-number {
+        display: inline-block;
         text-align: center;
-        font-size: 2.5em;
+        font-size: 1.4em;
         font-weight: 700;
         color: rgb(255, 196, 0);
-    }
-
-    .snap-content {
-        position: absolute;
-        bottom: 0.8em;
-        width: 100%;
-        text-align: center;
-        font-weight: 300;
     }
 </style>
