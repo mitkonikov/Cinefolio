@@ -33,9 +33,13 @@
     }
 
     #videos-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        
         position: relative;
-        margin-left: auto;
-        margin-right: auto;
-        width: fit-content;
+        margin-left: 3em;
+        margin-right: 3em;
+        height: fit-content;
     }
 </style>
