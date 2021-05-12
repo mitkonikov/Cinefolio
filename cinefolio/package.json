@@ -22,7 +22,7 @@
   "dependencies": {
     "firebase": "^7.23.0",
     "node-sass": "^4.14.1",
-    "rollup-plugin-postcss": "^3.1.2",
+    "rollup-plugin-postcss": "^4.0.0",
     "rxfire": "^3.13.5",
     "rxjs": "^6.6.2",
     "sirv-cli": "^1.0.0",
