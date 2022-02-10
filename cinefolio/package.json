@@ -12,7 +12,7 @@
     "@rollup/plugin-commonjs": "^12.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
     "@sveltech/routify": "^1.9.7",
-    "node-sass": "^6.0.0",
+    "node-sass": "^7.0.0",
     "rollup": "^2.3.4",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-svelte": "^5.0.3",
