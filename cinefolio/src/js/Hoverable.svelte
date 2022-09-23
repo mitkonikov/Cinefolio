@@ -10,6 +10,12 @@
 	}
 </script>
 
-<div on:mouseenter={enter} on:mouseleave={leave}>
+<div class="hoverable" on:mouseenter={enter} on:mouseleave={leave}>
 	<slot hovering={hovering}></slot>
 </div>
+
+<style>
+	.hoverable {
+		display: inline-block;
+	}
+</style>

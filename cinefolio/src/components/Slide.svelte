@@ -105,7 +105,7 @@
     }
 
 	.slide-more {
-		width: 27em;
+		transform: scale(1.4);
 	}
 
     .slide {
@@ -131,6 +131,7 @@
     .text-container {
         padding: 0.5em 1em 0.9em 1em;
 		position: relative;
+        font-size: 0.8em;
     }
 
     .text-title {
