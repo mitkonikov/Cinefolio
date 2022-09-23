@@ -33,5 +33,6 @@
         justify-content: center;
         align-content: center;
         margin-top: 0.3em;
+        z-index: -1000;
     }
 </style>
