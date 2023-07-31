@@ -9,6 +9,7 @@
 	export let timestamp;
 	export let embedlink;
 	export let textHeight = 6;
+    export let first = false;
 
 	// Calculating the width and height after hovering on the element
     let width, height;
@@ -43,7 +44,7 @@
 
 <Hoverable let:hovering>
     <div
-        class={hovering ? "slide slide-more" : "slide"}
+        class={"slide " + (hovering ? (first ? "slide-more-first" : "slide-more") : "")}
         on:click={() => {
             window.open(link, "_black");
         }}
@@ -93,6 +94,7 @@
 
     .thumbnail-video-wrapper {
         width: 100%;
+        font-size: 0.4em;
     }
 
     .slide {
@@ -106,7 +108,13 @@
 
 	.slide-more {
 		transform: scale(1.4);
+        z-index: 100000;
 	}
+
+    .slide-more-first {
+		transform: scale(1.4) translate(3em, 0);
+        z-index: 100000;
+    }
 
     .slide {
         margin: 0.5em;
