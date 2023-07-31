@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "target": "javascripter",
+    "target": "cinefolio",
     "public": "cinefolio/public",
     "ignore": [
       "firebase.json",
