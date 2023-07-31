@@ -7,6 +7,9 @@
       "hosting": {
         "javascripter": [
           "javascripter"
+        ],
+        "cinefolio": [
+          "cinefolio"
         ]
       }
     }
