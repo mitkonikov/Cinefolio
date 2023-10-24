@@ -5,6 +5,7 @@
     "dev": "cd public && rmdir /s /q build & cd .. && routify -c serv",
     "serv": "rollup -c -w",
     "build": "cd public && rmdir /s /q build & cd .. && routify -c serv-build",
+    "build-github": "routify -c serv-build",
     "serv-build": "rollup -c",
     "start": "sirv public"
   },
