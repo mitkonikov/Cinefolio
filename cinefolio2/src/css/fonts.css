@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'Breeze';
+    font-weight: 100;
+    src: url('/fonts/Breeze/BreezeSans-Thin_20150728.ttf');
+}
+
+@font-face {
+    font-family: 'Breeze';
+    font-weight: 300;
+    src: url('/fonts/Breeze/BreezeSans-Light_20150728.ttf');
+}
+
+@font-face {
+    font-family: 'Breeze';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/Breeze/BreezeSans-Regular_20150728.ttf');
+}
+
+@font-face {
+    font-family: 'Breeze';
+    font-weight: 500;
+    src: url('/fonts/Breeze/BreezeSans-Medium_20150728.ttf');
+}
+
+@font-face {
+    font-family: 'Breeze';
+    font-style: bold;
+    font-weight: 700;
+    src: url('/fonts/Breeze/BreezeSans-Bold_20150728.ttf');
+}
