@@ -1,0 +1,11 @@
+.splide {
+    padding: 0.5em 0.5em;
+}
+
+.splide__pagination {
+    bottom: -1em;
+}
+
+.splide__track {
+    padding: 0.3em 0;
+}

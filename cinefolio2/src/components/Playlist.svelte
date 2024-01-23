@@ -6,6 +6,31 @@
 	import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
     import Slide from './../components/Slide.svelte';
 
+    import { Splide, SplideSlide } from '@splidejs/svelte-splide';
+
+    import '@splidejs/svelte-splide/css';
+    import '@splidejs/svelte-splide/css/sea-green';
+    import './../css/splide.css';
+
+    $: splideOptions = {
+        type: 'loop',
+        perPage: 6,
+        breakpoints: {
+            500: {
+                perPage: 2,
+            },
+            800: {
+                perPage: 3,
+            },
+            1080: {
+                perPage: 4,
+            },
+            1400: {
+                perPage: 5,
+            },
+        }
+    };
+
     // @ts-ignore
     /**
 	 * @type {any[]}
@@ -18,27 +43,25 @@
         snapshot.forEach((doc) => {
             videos = [...videos, (doc.data())];
         });
+        while (videos.length < 12) {
+            videos = [...videos, ...videos];
+        }
+        while (videos.length > 12) {
+            (videos as []).pop();
+        }
     });
 </script>
 
 <div class="playlist-wrapper">
     <div class="title">{displayName}</div>
     <div class="videos-slider">
-        <!-- <div class="left-arrow arrow-container">
-            <div class="arrow">
-                L
-            </div>
-        </div> -->
-        <div class="videos-container">
+        <Splide aria-label="Playlist" options={splideOptions}>
             {#each videos as video}
-                <Slide {...video} first={videos.at(0) == video}/>
+                <SplideSlide>
+                    <Slide {...video} first={videos.at(0) == video}/>
+                </SplideSlide>
             {/each}
-        </div>
-        <!-- <div class="right-arrow arrow-container">
-            <div class="arrow">
-                R
-            </div>
-        </div> -->
+        </Splide>
     </div>
 </div>
 
@@ -47,10 +70,10 @@
         font-size: 1.6em;
         font-weight: 300;
         margin-bottom: 0.5em;
+        padding: 2em 2em 0 1em;
     }
 
     .playlist-wrapper {
-        padding: 2em 2em 0 2em;
         position: relative;
     }
 
@@ -59,38 +82,5 @@
         overflow-x: hidden;
         padding: 6em 0;
         margin: -6em 0;
-    }
-
-    .videos-container {
-        height: 13em;
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .arrow-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: black;
-    }
-
-    .left-arrow {
-        width: 2em;
-        height: 13em;
-        position: absolute;
-        z-index: 100000;
-    }
-
-    .right-arrow {
-        width: 2em;
-        height: 13em;
-        position: absolute;
-        right: 0;
-        top: 6em;
-    }
-
-    .arrow {
-
     }
 </style>
