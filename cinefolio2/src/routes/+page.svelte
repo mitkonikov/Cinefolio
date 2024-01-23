@@ -34,7 +34,7 @@
 		position: absolute;
 		width: 100vw;
 		height: 100vh;
-		background-image: url('/img/02.jpg');
+		background-image: url('/img/Stars.jpg');
 		background-repeat: no-repeat;
 		background-size: cover;
 		opacity: 0.3;
