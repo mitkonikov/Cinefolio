@@ -1,7 +1,7 @@
 {
   "hosting": {
     "target": "cinefolio",
-    "public": "cinefolio/public",
+    "public": "cinefolio2/build",
     "ignore": [
       "firebase.json",
       "**/.*",
