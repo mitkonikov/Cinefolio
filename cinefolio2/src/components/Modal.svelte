@@ -1,5 +1,6 @@
 <script lang="ts">
     import Close from "svelte-material-icons/Close.svelte";
+    import IconButton from "./IconButton.svelte";
 
 	export let showModal: boolean;
 
@@ -16,28 +17,27 @@
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
-		<slot name="header" />
-		<hr />
 		<slot />
-		<hr />
+		<hr class="decoration" />
 		<!-- svelte-ignore a11y-autofocus -->
 		<div class="close-btn" autofocus on:click={() => dialog.close()}>
-            <Close></Close>
+            <IconButton>
+                <Close></Close>
+            </IconButton>
         </div>
 	</div>
 </dialog>
 
 <style>
 	dialog {
-		padding: 1.5em 1em 1em 1em;
-        background-color: rgb(0, 26, 45);
+        background-color: rgb(0, 12, 21);
         color: white;
+        border: none !important;
+        padding: 0;
+        outline: 0px solid !important;
 	}
 	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.3);
-	}
-	dialog > div {
-		padding: 1em;
+		background: rgba(0, 0, 0, 0.814);
 	}
 	dialog[open] {
 		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -65,5 +65,8 @@
         position: absolute;
         top: 1em;
         right: 1em;
+    }
+    .decoration {
+        margin: 0.5em 0 0 0;
     }
 </style>
