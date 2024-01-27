@@ -11,7 +11,6 @@
     import '@splidejs/svelte-splide/css';
     import '@splidejs/svelte-splide/css/sea-green';
     import './../css/splide.css';
-	import { onMount } from 'svelte';
 
     $: splideOptions = {
         type: 'loop',
@@ -65,7 +64,7 @@
             <Splide aria-label="Playlist" options={splideOptions}>
                 {#each videos as video}
                     <SplideSlide>
-                        <Slide {...video} first={videos.at(0) == video}/>
+                        <Slide data={video}/>
                     </SplideSlide>
                 {/each}
             </Splide>
