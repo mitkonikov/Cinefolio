@@ -11,10 +11,12 @@
     import '@splidejs/svelte-splide/css';
     import '@splidejs/svelte-splide/css/sea-green';
     import './../css/splide.css';
+	import { onMount } from 'svelte';
 
     $: splideOptions = {
         type: 'loop',
         perPage: 6,
+        drag: false,
         breakpoints: {
             500: {
                 perPage: 2,
@@ -30,6 +32,8 @@
             },
         }
     };
+
+    $: splideInit = false;
 
     // @ts-ignore
     /**
@@ -49,19 +53,23 @@
         while (videos.length > 12) {
             (videos as []).pop();
         }
+        videos = [...videos];
+        splideInit = true;
     });
 </script>
 
 <div class="playlist-wrapper">
     <div class="title">{displayName}</div>
     <div class="videos-slider">
-        <Splide aria-label="Playlist" options={splideOptions}>
-            {#each videos as video}
-                <SplideSlide>
-                    <Slide {...video} first={videos.at(0) == video}/>
-                </SplideSlide>
-            {/each}
-        </Splide>
+        {#if splideInit}
+            <Splide aria-label="Playlist" options={splideOptions}>
+                {#each videos as video}
+                    <SplideSlide>
+                        <Slide {...video} first={videos.at(0) == video}/>
+                    </SplideSlide>
+                {/each}
+            </Splide>
+        {/if}
     </div>
 </div>
 
@@ -73,14 +81,10 @@
         padding: 2em 2em 0 1em;
     }
 
-    .playlist-wrapper {
-        position: relative;
-    }
-
-    .videos-slider {
-        position: relative;
-        overflow-x: hidden;
-        padding: 6em 0;
-        margin: -6em 0;
+    @media only screen and (max-width: 600px) {
+        .title {
+            font-size: 1em;
+            margin-bottom: 0em;
+        }
     }
 </style>
