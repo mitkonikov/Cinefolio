@@ -1,22 +1,9 @@
 <script lang="ts">
     // import { collectionData } from 'rxfire/firestore';
     // import { startWith } from 'rxjs/operators';
-    import { db } from '$lib/firebase';
-	import { collection, getDocs, limit, query } from 'firebase/firestore';
+    // import { db } from '$lib/firebase';
+	// import { collection, getDocs, limit, query } from 'firebase/firestore';
     import Playlist from './../components/Playlist.svelte';
-
-    let metadata = {
-        Projects: 0,
-        Clients: 0,
-        Videos: 0
-    };
-
-    const q = query(collection(db, 'Home'), limit(1))
-    const querySnapshot = getDocs(q).then((snapshot) => {
-        snapshot.forEach((doc) => {
-            metadata = doc.data() as any;
-        });
-    });
 </script>
 
 <main>

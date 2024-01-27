@@ -1,16 +1,9 @@
 <script lang="ts">
-	import type { Timestamp } from "firebase/firestore";
     import Hoverable from "./Hoverable.svelte";
+	import Modal from './Modal.svelte';
+	import type { IFilm } from "../types/film";
 
-    export let thumb : string;
-    export let alt : string;
-    export let title : string;
-    export let content : string;
-    export let link : string;
-	export let timestamp : Timestamp;
-	export let embedlink : string;
-	export let textHeight = 6;
-    export let first = false;
+    export let data: IFilm;
 
 	// We check if data saver is enabled on the device
     let dataSaver = false;
@@ -32,14 +25,14 @@
         }}
     >
         <div class="frame-container">
-            <img src={thumb} class="thumbnail" {alt} />
+            <img src={data.thumb} class="thumbnail" alt={data.alt} />
             {#if hovering}
                 <div class="slide-overlay"></div>
                 <div class="text-container noselect">
                     <div>
-                        <div class="text-title">{title}</div>
-                        <div class="text-content">{content}</div>
-                        <div class="timestamp">  Published {timestamp.toDate().getFullYear()}</div>
+                        <div class="text-title">{data.title}</div>
+                        <div class="text-content">{data.content}</div>
+                        <div class="timestamp">  Published {data.timestamp.toDate().getFullYear()}</div>
                     </div>
                 </div>
             {/if}
