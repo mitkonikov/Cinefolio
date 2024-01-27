@@ -2,6 +2,8 @@
     import Hoverable from "./Hoverable.svelte";
 	import Modal from './Modal.svelte';
 	import type { IFilm } from "../types/film";
+    import Play from "svelte-material-icons/Play.svelte";
+	import IconButton from "./IconButton.svelte";
 
     export let data: IFilm;
 
@@ -13,6 +15,8 @@
             dataSaver = true;
         }
 	}
+
+    let showModal = false;
 </script>
 
 <Hoverable let:hovering>
@@ -21,7 +25,7 @@
     <div
         class={"slide"}
         on:click={() => {
-            window.open(link, "_black");
+            showModal = true;
         }}
     >
         <div class="frame-container">
@@ -39,6 +43,26 @@
         </div>
     </div>
 </Hoverable>
+
+<Modal bind:showModal>
+    <div class="thumbnail-container">
+        <img src={data.thumb} class="thumbnail" alt={data.alt} />
+        <div class="play-btn">
+            <IconButton on:click={() => {
+                window.open(data.link, "_black");
+            }}>
+                <Play></Play>
+            </IconButton>
+        </div>
+    </div>
+    <div class="modal-info noselect">
+        <div>
+            <div class="text-title">{data.title}</div>
+            <div class="text-content">{data.content}</div>
+            <div class="timestamp">  Published {data.timestamp.toDate().getFullYear()}</div>
+        </div>
+    </div>
+</Modal>
 
 <style>
     .thumbnail {
@@ -104,4 +128,43 @@
 		font-size: 0.7em;
 		bottom: 1em;
 	}
+
+    .modal-info {
+        padding: 1em 1em 2em 1em;
+    }
+
+    .modal-info .text-title {
+        font-size: 1.5em;
+    }
+
+    .modal-info .text-content {
+        margin-bottom: 1em;
+        font-size: 1.1em;
+        max-width: 600px;
+    }
+
+    .modal-info .timestamp {
+        margin-bottom: 1em;
+    }
+
+    .thumbnail-container {
+        position: relative;
+    }
+
+    .play-btn {
+        position: absolute;
+        bottom: 0.5em;
+        right: 1em;
+        font-size: 2em;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .modal-info .text-title {
+            font-size: 1.2em;
+        }
+
+        .modal-info .text-content {
+            font-size: 0.8em;
+        }
+    }
 </style>
