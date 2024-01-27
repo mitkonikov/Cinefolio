@@ -23,6 +23,10 @@ export const files = {
       published: {
         type: 'date',
       },
+      playlist: {
+        type: 'reference',
+        reference: 'Playlist',
+      },
     },
   },
   features: [
