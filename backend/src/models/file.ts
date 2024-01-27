@@ -6,6 +6,7 @@ const schema = new mongoose.Schema({
   title: String,
   description: String,
   published: Date,
+  playlist: { type: mongoose.Schema.Types.ObjectId, ref: 'Playlist' },
 });
 
 const File = mongoose.model('File', schema);

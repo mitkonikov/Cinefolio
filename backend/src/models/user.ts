@@ -21,8 +21,8 @@ const userSchema = new Schema<IUser>({
 });
 
 // Hash the user's password before saving
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-userSchema.pre<IUser>('save', async (next) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, func-names
+userSchema.pre<IUser>('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user: IUser = this;
 

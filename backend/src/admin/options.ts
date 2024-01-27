@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { AdminJSOptions } from 'adminjs';
 
 import { files } from '../resources/files.js';
+import { playlists } from '../resources/playlists.js';
 
 import componentLoader from './component-loader.js';
 
@@ -15,6 +16,7 @@ const options: AdminJSOptions = {
   rootPath: '/admin',
   resources: [
     files,
+    playlists,
   ],
   databases: [],
   dashboard: {
