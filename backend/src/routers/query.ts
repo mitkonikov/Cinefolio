@@ -53,7 +53,7 @@ router.get('/films/:playlist', async (req, res) => {
 
 router.get('/trailers', async (req, res) => {
   try {
-    const trailers = await Trailer.find({ visible: true });
+    const trailers = await Trailer.find({ visible: true }).populate('film').populate('thumbnail');
 
     res.json({ trailers });
   } catch (exception) {
