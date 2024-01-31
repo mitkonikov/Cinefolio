@@ -5,11 +5,17 @@ export interface IThumbnail {
 }
 
 export interface IFilm {
-    title : string;
-    description : string;
+    title: string;
+    description: string;
     filepath: string;
-    link : string | undefined;
-    thumbnail : IThumbnail;
-	published : string;
-	embedlink : string;
+    link: string | undefined;
+    thumbnail: IThumbnail;
+	published: string;
+	embedlink: string;
+};
+
+export interface ITrailer {
+    film: string;
+    filepath: string;
+    visible: string;
 };
