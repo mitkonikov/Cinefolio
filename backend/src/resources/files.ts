@@ -1,6 +1,6 @@
 import uploadFeature, { LocalUploadOptions } from '@adminjs/upload';
 
-import componentLoader from '../admin/component-loader.js';
+import { componentLoader } from '../admin/component-loader.js';
 import File from '../models/file.js';
 
 const localProvider: LocalUploadOptions = {

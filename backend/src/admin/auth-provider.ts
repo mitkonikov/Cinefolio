@@ -2,7 +2,7 @@ import { DefaultAuthProvider } from 'adminjs';
 
 import { findUser } from '../models/user.js';
 
-import componentLoader from './component-loader.js';
+import { componentLoader } from './component-loader.js';
 
 const provider = new DefaultAuthProvider({
   componentLoader,
