@@ -14,6 +14,9 @@ export const trailers = {
   resource: Trailer,
   options: {
     properties: {
+      visible: {
+        type: 'boolean',
+      },
       film: {
         type: 'reference',
         reference: 'File',

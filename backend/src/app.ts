@@ -4,12 +4,16 @@ import path from 'path';
 import express from 'express';
 import AdminJS from 'adminjs';
 import { buildAuthenticatedRouter } from '@adminjs/express';
+import bodyParser from 'body-parser';
 
 import provider from './admin/auth-provider.js';
 import options from './admin/options.js';
 import initializeDb from './db/index.js';
+import QueryAPI from './routers/query.js';
 
 const port = process.env.PORT || 3000;
+
+const jsonParser = bodyParser.json();
 
 const start = async () => {
   const app = express();
@@ -40,6 +44,7 @@ const start = async () => {
   );
 
   app.use(admin.options.rootPath, router);
+  app.use('/api/query', jsonParser, QueryAPI);
 
   const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
   app.use(express.static(path.join(__dirname, '../public')));
