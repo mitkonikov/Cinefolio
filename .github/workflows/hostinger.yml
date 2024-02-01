@@ -30,4 +30,4 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        ssh -i ./ssh_key -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST 'cd /home/micho/cine/'
+        ssh -i ./ssh_key -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST 'cd /home/micho/cine/ && bash build.sh'
