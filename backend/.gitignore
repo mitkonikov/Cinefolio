@@ -2,3 +2,4 @@ node_modules
 dist
 .adminjs
 public/files
+public/thumbs
