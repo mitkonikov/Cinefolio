@@ -1,0 +1,57 @@
+version: '2.1'
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ~/data:/data
+    networks:
+      - app-net
+
+  frontend:
+    build:
+      context: ./cinefolio2
+    ports:
+      - "5000:80"
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://frontend:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ~/_logs:/_logs
+      - ~/public:/public
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://backend:3000/admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - app-net
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+networks:
+  app-net:
