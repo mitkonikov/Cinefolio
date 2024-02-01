@@ -12,14 +12,7 @@ const localProvider: LocalUploadOptions = {
 
 export const thumbnails = {
   resource: Thumbnail,
-  options: {
-    properties: {
-      film: {
-        type: 'reference',
-        reference: 'File',
-      },
-    },
-  },
+  options: {},
   features: [
     uploadFeature({
       componentLoader,

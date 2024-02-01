@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
+  title: String,
   filepath: String,
-  film: { type: mongoose.Schema.Types.ObjectId, ref: 'File' },
 });
 
 const Thumbnail = mongoose.model('Thumbnail', schema);
