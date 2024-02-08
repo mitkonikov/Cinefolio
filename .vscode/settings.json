@@ -6,5 +6,7 @@
         "Hoverable",
         "Splide",
         "splidejs"
-    ]
+    ],
+    "prettier.endOfLine": "lf",
+    "files.eol": "\n"
 }

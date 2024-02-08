@@ -18,8 +18,8 @@ services:
       - app-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://frontend:80/"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   backend:
@@ -36,8 +36,8 @@ services:
       - app-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://backend:3000/admin"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   nginx:
