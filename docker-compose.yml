@@ -7,7 +7,7 @@ services:
     volumes:
       - ~/data:/data
     networks:
-      - app-net
+      - gateway_app-net
 
   backend:
     build:
@@ -20,7 +20,7 @@ services:
     depends_on:
       - mongodb
     networks:
-      - app-net
+      - gateway_app-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://backend:3000/admin"]
       interval: 30s
@@ -28,4 +28,5 @@ services:
       retries: 5
 
 networks:
-  app-net:
+  gateway_app-net:
+    external: true
