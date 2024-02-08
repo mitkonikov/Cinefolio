@@ -9,19 +9,6 @@ services:
     networks:
       - app-net
 
-  frontend:
-    build:
-      context: ./cinefolio2
-    ports:
-      - "5000:80"
-    networks:
-      - app-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://frontend:80/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
   backend:
     build:
       context: ./backend
@@ -39,19 +26,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  nginx:
-    build:
-      context: ./nginx
-    ports:
-      - "80:80"
-    networks:
-      - app-net
-    depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
 
 networks:
   app-net:
