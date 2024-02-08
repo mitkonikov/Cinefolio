@@ -44,10 +44,12 @@ const start = async () => {
   );
 
   app.use(admin.options.rootPath, router);
-  app.use('/api/query', jsonParser, QueryAPI);
+  app.use('/cinefolio/api/query', jsonParser, QueryAPI);
 
   const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-  app.use(express.static(path.join(__dirname, '../public')));
+  const publicDir = path.join(__dirname, '../public');
+  console.log("Public Directory: ", publicDir);
+  app.use('/cinefolio/public', express.static(publicDir));
 
   app.listen(port, () => {
     console.log(`AdminJS available at http://localhost:${port}${admin.options.rootPath}`);

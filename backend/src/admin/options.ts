@@ -15,7 +15,9 @@ const __dirname = path.dirname(__filename);
 
 const options: AdminJSOptions = {
   componentLoader,
-  rootPath: '/admin',
+  rootPath: '/cinefolio/admin',
+  loginPath: '/cinefolio/admin/login',
+  logoutPath: '/cinefolio/admin/logout',
   resources: [
     files,
     playlists,
