@@ -1,14 +1,8 @@
-import uploadFeature, { LocalUploadOptions } from '@adminjs/upload';
+import uploadFeature from '@adminjs/upload';
 
 import { componentLoader } from '../admin/component-loader.js';
 import Trailer from '../models/trailer.js';
-
-const localProvider: LocalUploadOptions = {
-  bucket: 'public/trailers',
-  opts: {
-    baseUrl: '/trailers',
-  },
-};
+import UploadProvider from '../admin/upload-provider.js';
 
 export const trailers = {
   resource: Trailer,
@@ -26,7 +20,9 @@ export const trailers = {
   features: [
     uploadFeature({
       componentLoader,
-      provider: { local: localProvider },
+      provider: new UploadProvider('public/trailers', {
+        baseUrl: '/trailers',
+      }),
       validation: {
         mimeTypes: [
           'video/mp4',
