@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 
-const schema = new mongoose.Schema({
+// Define Thumbnail interface
+export interface IThumbnail extends Document {
+  title: string;
+  filepath: string;
+}
+
+const schema = new mongoose.Schema<IThumbnail>({
   title: String,
   filepath: String,
 });
