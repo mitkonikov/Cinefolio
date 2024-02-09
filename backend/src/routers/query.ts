@@ -3,15 +3,31 @@ import express from 'express';
 import File from '../models/file.js';
 import Trailer from '../models/trailer.js';
 import Playlist from '../models/playlist.js';
+import Site from '../models/site.js';
 
 const router = express.Router();
 
 router.get('/playlists', async (req, res) => {
-  const playlists = await Playlist.find()
-    .sort({ published: -1 }) // Sort in descending order based on the 'published' field
-    .limit(10); // Limit the result to the last 10 files
+  try {
+    const { site } = req.body;
 
-  res.json({ playlists });
+    const siteDoc = await Site.findOne({ name: site });
+
+    if (!siteDoc) {
+      console.log('No site found by the name ', site);
+      res.json({ error: 'No site found by the name.' });
+      return;
+    }
+
+    const playlists = await Playlist.find({ site: siteDoc._id })
+      .sort({ published: -1 }) // Sort in descending order based on the 'published' field
+      .limit(10); // Limit the result to the last 10 files
+
+    res.json({ playlists });
+  } catch (exception) {
+    console.log(exception);
+    res.json({ error: 'Internal server error' });
+  }
 });
 
 router.get('/films', async (req, res) => {

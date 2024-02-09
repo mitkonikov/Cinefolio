@@ -5,7 +5,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ~/data:/data
+      - ~/data/db:/data/db
     networks:
       - gateway_app-net
 
