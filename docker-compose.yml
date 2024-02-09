@@ -1,22 +1,25 @@
 version: '2.1'
 services:
   mongodb:
-    image: mongo:latest
+    build:
+      context: ./mongodb
     ports:
       - "27017:27017"
     volumes:
       - ~/data/db:/data/db
+    env_file:
+      - ./mongodb/.env
     networks:
       - gateway_app-net
 
   backend:
     build:
       context: ./backend
+    ports:
+      - "3000:3000"
     volumes:
       - ~/_logs:/_logs
       - ~/public:/public
-    ports:
-      - "3000:3000"
     depends_on:
       - mongodb
     networks:

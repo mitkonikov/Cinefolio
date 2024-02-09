@@ -27,8 +27,5 @@ RUN npm install .
 # Typescript compile
 RUN npm run build
 
-# Expose the port your app runs on
-EXPOSE 5000
-
 # Define the command to run your app
 CMD ["bash", "/start.sh"]
