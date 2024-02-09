@@ -48,7 +48,7 @@ const start = async () => {
 
   const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
   const publicDir = path.join(__dirname, '../public');
-  console.log("Public Directory: ", publicDir);
+  console.log('Public Directory: ', publicDir);
   app.use('/cinefolio/public', express.static(publicDir));
 
   app.listen(port, () => {
