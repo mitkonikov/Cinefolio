@@ -14,6 +14,9 @@ export const files = {
   resource: File,
   options: {
     properties: {
+      link: {
+        type: 'string',
+      },
       title: {
         type: 'string',
       },
