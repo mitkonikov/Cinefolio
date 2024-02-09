@@ -7,6 +7,7 @@ import { files } from '../resources/files.js';
 import { playlists } from '../resources/playlists.js';
 import { thumbnails } from '../resources/thumbnail.js';
 import { trailers } from '../resources/trailer.js';
+import { sites } from '../resources/site.js';
 
 import { componentLoader } from './component-loader.js';
 
@@ -23,6 +24,7 @@ const options: AdminJSOptions = {
     playlists,
     thumbnails,
     trailers,
+    sites,
   ],
   databases: [],
   dashboard: {

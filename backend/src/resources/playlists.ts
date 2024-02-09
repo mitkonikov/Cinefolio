@@ -7,6 +7,10 @@ export const playlists = {
       name: {
         type: 'string',
       },
+      site: {
+        type: 'reference',
+        reference: 'Site',
+      },
     },
   },
 };
