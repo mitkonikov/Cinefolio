@@ -1,14 +1,8 @@
-import uploadFeature, { LocalUploadOptions } from '@adminjs/upload';
+import uploadFeature from '@adminjs/upload';
 
 import { componentLoader } from '../admin/component-loader.js';
 import File from '../models/file.js';
-
-const localProvider: LocalUploadOptions = {
-  bucket: 'public/files',
-  opts: {
-    baseUrl: '/files',
-  },
-};
+import UploadProvider from '../admin/upload-provider.js';
 
 export const files = {
   resource: File,
@@ -35,7 +29,9 @@ export const files = {
   features: [
     uploadFeature({
       componentLoader,
-      provider: { local: localProvider },
+      provider: new UploadProvider('public/files', {
+        baseUrl: '/files',
+      }),
       validation: {
         mimeTypes: [
           'video/mp4',

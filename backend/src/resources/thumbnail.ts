@@ -1,14 +1,8 @@
-import uploadFeature, { LocalUploadOptions } from '@adminjs/upload';
+import uploadFeature from '@adminjs/upload';
 
 import { componentLoader } from '../admin/component-loader.js';
 import Thumbnail from '../models/thumbnail.js';
-
-const localProvider: LocalUploadOptions = {
-  bucket: 'public/thumbs',
-  opts: {
-    baseUrl: '/thumbs',
-  },
-};
+import UploadProvider from '../admin/upload-provider.js';
 
 export const thumbnails = {
   resource: Thumbnail,
@@ -16,7 +10,9 @@ export const thumbnails = {
   features: [
     uploadFeature({
       componentLoader,
-      provider: { local: localProvider },
+      provider: new UploadProvider('public/thumbs', {
+        baseUrl: '/thumbs',
+      }),
       validation: {
         mimeTypes: [
           'image/jpeg',
