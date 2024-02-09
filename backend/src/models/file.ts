@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
-  bucket: String,
   filepath: String,
+  link: String,
   title: String,
   description: String,
   published: Date,
