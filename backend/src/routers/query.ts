@@ -7,9 +7,9 @@ import Site from '../models/site.js';
 
 const router = express.Router();
 
-router.get('/playlists', async (req, res) => {
+router.get('/playlists/:site', async (req, res) => {
   try {
-    const { site } = req.body;
+    const { site } = req.params;
 
     const siteDoc = await Site.findOne({ name: site });
 
@@ -30,9 +30,9 @@ router.get('/playlists', async (req, res) => {
   }
 });
 
-router.get('/films', async (req, res) => {
+router.get('/films/:playlist', async (req, res) => {
   try {
-    const { playlist } = req.body;
+    const { playlist } = req.params;
 
     const playlistDoc = await Playlist.findOne({ name: playlist });
 
