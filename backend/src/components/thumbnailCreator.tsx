@@ -41,6 +41,7 @@ export default function ThumbnailCreator() {
   const [images, setImages] = useState([]);
   const [thumb, setThumb] = useState(0);
   const [status, setStatus] = useState('IDLE');
+  const [frameCount, setFrameCount] = useState(300);
 
   const onInput = async (event) => {
     setImages([]);
@@ -48,7 +49,7 @@ export default function ThumbnailCreator() {
 
     const [file] = event.target.files;
     const fileUrl = URL.createObjectURL(file);
-    const frames = await VideoToFrames.getFrames(fileUrl, 30, VideoToFramesMethod.totalFrames);
+    const frames = await VideoToFrames.getFrames(fileUrl, frameCount, VideoToFramesMethod.totalFrames);
 
     setStatus('IDLE');
     setImages(frames);
@@ -63,6 +64,21 @@ export default function ThumbnailCreator() {
       <div style={{ padding: '1em' }}>
         {status === 'IDLE' ? 'Choose file: ' : 'Loading... '}
         <input type="file" className="visually-hidden" accept="video/*" onChange={onInput} />
+
+        <div>
+          Frame count:
+          <input
+            value={frameCount}
+            onChange={(event) => {
+              try {
+                const k = parseInt(event.target.value, 10);
+                setFrameCount(k);
+              } catch (e) {
+                console.log(`Error: ${e}`);
+              }
+            }}
+          />
+        </div>
       </div>
 
       {images?.length > 0 && (
