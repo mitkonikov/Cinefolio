@@ -8,6 +8,14 @@ export const trailers = {
   resource: Trailer,
   options: {
     properties: {
+      _id: {
+        isVisible: {
+          list: false,
+          filter: false,
+          show: true,
+          edit: false,
+        },
+      },
       visible: {
         type: 'boolean',
       },
