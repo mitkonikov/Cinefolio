@@ -6,7 +6,13 @@ import UploadProvider from '../admin/upload-provider.js';
 
 export const thumbnails = {
   resource: Thumbnail,
-  options: {},
+  options: {
+    properties: {
+      crop: {
+        type: 'boolean',
+      },
+    },
+  },
   features: [
     uploadFeature({
       componentLoader,
