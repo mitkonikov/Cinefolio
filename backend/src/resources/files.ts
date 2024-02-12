@@ -8,6 +8,14 @@ export const files = {
   resource: File,
   options: {
     properties: {
+      _id: {
+        isVisible: {
+          list: false,
+          filter: false,
+          show: true,
+          edit: false,
+        },
+      },
       link: {
         type: 'string',
       },
@@ -23,6 +31,14 @@ export const files = {
       playlist: {
         type: 'reference',
         reference: 'Playlist',
+      },
+      filepath: {
+        isVisible: {
+          list: false,
+          filter: false,
+          show: true,
+          edit: false,
+        },
       },
     },
   },
