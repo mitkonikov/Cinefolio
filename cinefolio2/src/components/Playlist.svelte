@@ -1,13 +1,13 @@
 <script lang="ts">
-    export let repositoryName;
-    export let displayName = repositoryName;
+    export let playlist: IPlaylist;
 
-    import { db } from '$lib/firebase';
-	import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
+	import { onMount } from 'svelte';
     import Slide from './../components/Slide.svelte';
+	import type { IFilm } from '../types/film';
+	import type { IPlaylist } from '../types/playlist';
+	import { API_URL } from '$lib/constants';
 
     import { Splide, SplideSlide } from '@splidejs/svelte-splide';
-
     import '@splidejs/svelte-splide/css';
     import '@splidejs/svelte-splide/css/sea-green';
     import './../css/splide.css';
@@ -32,35 +32,33 @@
         }
     };
 
+    let videos: IFilm[] = [];
     $: splideInit = false;
 
-    // @ts-ignore
-    /**
-	 * @type {any[]}
-	 */
-    let videos: string | any[] = [];
+    onMount(async () => {
+        fetch(`${API_URL}/query/films/${playlist.name}`, {
+            method: 'GET',
+            mode: 'cors'
+        }).then((response) => response.json())
+        .then((value) => {
+            videos = value.files;
+            if (videos.length > 0) {
+                splideInit = true;
+            }
 
-    const q = query(collection(db, repositoryName), orderBy('timestamp', 'desc'), limit(5));
-    // @ts-ignore
-    const querySnapshot = getDocs(q).then((snapshot) => {
-        snapshot.forEach((doc) => {
-            videos = [...videos, (doc.data())];
+            videos.sort((a: IFilm, b: IFilm) => {
+                let dateA = new Date(a.published);
+                let dateB = new Date(b.published);
+                return Number(dateB) - Number(dateA);
+            });
         });
-        while (videos.length < 12) {
-            videos = [...videos, ...videos];
-        }
-        while (videos.length > 12) {
-            (videos as []).pop();
-        }
-        videos = [...videos];
-        splideInit = true;
     });
 </script>
 
 <div class="playlist-wrapper">
-    <div class="title">{displayName}</div>
-    <div class="videos-slider">
-        {#if splideInit}
+    {#if splideInit}
+        <div class="title">{playlist.name}</div>
+        <div class="videos-slider">
             <Splide aria-label="Playlist" options={splideOptions}>
                 {#each videos as video}
                     <SplideSlide>
@@ -68,8 +66,8 @@
                     </SplideSlide>
                 {/each}
             </Splide>
-        {/if}
-    </div>
+        </div>
+    {/if}
 </div>
 
 <style>

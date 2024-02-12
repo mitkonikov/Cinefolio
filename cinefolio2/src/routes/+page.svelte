@@ -1,38 +1,38 @@
 <script lang="ts">
-    // import { collectionData } from 'rxfire/firestore';
-    // import { startWith } from 'rxjs/operators';
-    // import { db } from '$lib/firebase';
-	// import { collection, getDocs, limit, query } from 'firebase/firestore';
+	import { onMount } from 'svelte';
     import Playlist from './../components/Playlist.svelte';
+    import { type IPlaylist } from './../types/playlist';
+	import { API_URL } from '$lib/constants';
+
+    let playlists: IPlaylist[] = [];
+    $: playlistsLoaded = false;
+
+    onMount(async () => {
+        fetch(`${API_URL}/query/playlists/Cinefolio`, {
+            method: 'GET',
+            mode: 'cors'
+        }).then((response) => response.json())
+        .then((value) => {
+            playlists = value.playlists;
+            playlistsLoaded = true;
+        });
+    });
 </script>
 
 <main>
-	<div class="bg-img" />
-
     <div class="noselect" id="logo">
         <div id="main-logo">cinefolio</div>
         <div class="logo-dec"></div>
     </div>
 	
     <div id="videos-container-center">
-        <Playlist repositoryName={"Videos"} displayName={"Latest"}/>
-        <Playlist repositoryName={"Strumica Open Festival"}/>
+        {#each playlists as playlist}
+            <Playlist playlist={playlist}/>
+        {/each}
     </div>
 </main>
 
 <style>
-	.bg-img {
-		overflow: hidden;
-		position: absolute;
-		width: 100vw;
-		height: 100vh;
-		background-image: url('/img/Stars.jpg');
-		background-repeat: no-repeat;
-		background-size: cover;
-		opacity: 0.3;
-        z-index: -1;
-	}
-
     #logo {
         width: 100%;
         text-align: center;
@@ -64,8 +64,6 @@
     #videos-container-center {
         position: relative;
         padding-top: 2em;
-        width: 100%;
-        height: 100%;
     }
 
     @media only screen and (max-width: 600px) {

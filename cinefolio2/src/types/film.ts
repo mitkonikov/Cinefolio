@@ -1,11 +1,15 @@
-import type { Timestamp } from "firebase/firestore";
+export interface IThumbnail {
+    title: string;
+    filepath: string;
+    crop: boolean;
+}
 
 export interface IFilm {
-    thumb : string;
-    alt : string;
     title : string;
-    content : string;
-    link : string;
-	timestamp : Timestamp;
+    description : string;
+    filepath: string;
+    link : string | undefined;
+    thumbnail : IThumbnail;
+	published : string;
 	embedlink : string;
 };
