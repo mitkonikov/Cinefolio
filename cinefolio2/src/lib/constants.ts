@@ -1,2 +1,2 @@
-export const API_URL = 'http://85.31.239.84/cinefolio/api';
-export const STATIC_URL = 'http://85.31.239.84/cinefolio/public';
+export const API_URL = 'https://vektor.mk/cinefolio/api';
+export const STATIC_URL = 'https://vektor.mk/cinefolio/public';
