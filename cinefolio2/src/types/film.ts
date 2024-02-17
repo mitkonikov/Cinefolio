@@ -15,7 +15,7 @@ export interface IFilm {
 };
 
 export interface ITrailer {
-    film: string;
+    film: IFilm;
     filepath: string;
     visible: string;
 };

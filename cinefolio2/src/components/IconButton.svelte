@@ -1,20 +1,25 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
+    export let size = "1.5em";
+    export let border = false;
+
     const dispatch = createEventDispatcher();
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="btn-icon" on:click={(event) => dispatch('click', event.detail)}>
-    <slot/>
+<div
+    class={"btn-icon" + (border ? " btn-icon-border" : "")}
+    style={`width: ${size}; height: ${size};`}
+    on:click={(event) => dispatch('click', event.detail)}
+    >
+        <slot/>
 </div>
 
 <style>
     .btn-icon {
         display: flex;
-        width: 1.5em;
-        height: 1.5em;
         justify-content: center;
         align-items: center;
     }
@@ -30,5 +35,10 @@
     .btn-icon:hover::before {
         background-color: rgba(255, 255, 255, 0.2);
         cursor: pointer;
+    }
+
+    .btn-icon-border {
+        border: 0.03em rgba(255, 255, 255, 0.6) solid;
+        border-radius: 50%;
     }
 </style>
