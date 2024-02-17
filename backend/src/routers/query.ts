@@ -53,9 +53,11 @@ router.get('/films/:playlist', async (req, res) => {
 
 router.get('/trailers', async (req, res) => {
   try {
-    const trailers = await Trailer.find({ visible: true }).populate('film').populate('thumbnail');
+    const trailers = await Trailer.find({ visible: true }).populate('film');
+    const file = await File.populate(trailers[0].film, { path: 'thumbnail' });
+    trailers[0].film = file as any;
 
-    res.json({ trailers });
+    res.json({ trailer: trailers[0] });
   } catch (exception) {
     console.log(exception);
     res.json({ error: 'Internal server error' });
