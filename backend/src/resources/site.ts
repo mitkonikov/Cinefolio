@@ -1,4 +1,7 @@
+import { ResourceOptions } from 'adminjs';
+
 import Site from '../models/site.js';
+import { SuperUserAction } from '../admin/privileges.js';
 
 export const sites = {
   resource: Site,
@@ -14,7 +17,9 @@ export const sites = {
       },
       name: {
         type: 'string',
+        isRequired: true,
       },
     },
-  },
+    actions: SuperUserAction,
+  } as ResourceOptions,
 };

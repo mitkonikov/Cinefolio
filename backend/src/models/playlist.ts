@@ -4,6 +4,8 @@ import { Document, Schema, model } from 'mongoose';
 export interface IPlaylist extends Document {
   name: string;
   site: Schema.Types.ObjectId;
+  visible: boolean;
+  order: number;
 }
 
 // Define playlist schema
@@ -13,7 +15,18 @@ export const playlistSchema = new Schema<IPlaylist>({
     unique: true,
     required: true,
   },
-  site: { type: Schema.Types.ObjectId, ref: 'Site' },
+  site: {
+    type: Schema.Types.ObjectId,
+    ref: 'Site',
+  },
+  visible: {
+    type: Boolean,
+    default: true,
+  },
+  order: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Playlist = model<IPlaylist>('Playlist', playlistSchema);

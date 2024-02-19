@@ -1,10 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
+import { ISite } from './site.js';
+
 // Define User interface
 interface IUser extends Document {
   email: string;
   password: string;
+  role: 'SUPER_ADMIN' | 'SITE_ADMIN'
+  site?: ISite;
 }
 
 // Define User schema
@@ -17,6 +21,14 @@ const userSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
+  },
+  role: {
+    type: String,
+    required: true,
+  },
+  site: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Site',
   },
 });
 
