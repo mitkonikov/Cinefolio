@@ -14,6 +14,9 @@
         }).then((response) => response.json())
         .then((value) => {
             playlists = value.playlists;
+            playlists.sort((a, b) => {
+                return a.order - b.order;
+            });
         });
     });
 </script>
@@ -23,7 +26,9 @@
 	
     <div id="videos-container-center">
         {#each playlists as playlist}
-            <Playlist playlist={playlist}/>
+            {#if playlist.visible}
+                <Playlist playlist={playlist}/>
+            {/if}
         {/each}
     </div>
 </main>

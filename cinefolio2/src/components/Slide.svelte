@@ -179,7 +179,7 @@
         background-color: rgba(0, 0, 0, 0.8);
     }
 
-    .slide-overlay, .slide-thumb-overlay {
+    .slide-overlay {
         background-color: black;
         opacity: 0.6;
         position: absolute;
