@@ -21,12 +21,14 @@ export const files = {
       },
       title: {
         type: 'string',
+        isRequired: true,
       },
       description: {
         type: 'textarea',
       },
       published: {
         type: 'date',
+        isRequired: true,
       },
       playlist: {
         type: 'reference',
