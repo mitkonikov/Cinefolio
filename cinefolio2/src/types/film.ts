@@ -1,3 +1,5 @@
+import type { IPlaylist } from "./playlist";
+
 export interface IThumbnail {
     title: string;
     filepath: string;
@@ -19,3 +21,8 @@ export interface ITrailer {
     filepath: string;
     visible: string;
 };
+
+export interface IFilmToPlaylist {
+    fileId: IFilm;
+    playlistId: IPlaylist;
+}

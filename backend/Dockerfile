@@ -24,8 +24,10 @@ COPY ./src /src
 WORKDIR /
 RUN npm install .
 
-# Typescript compile
-RUN npm run build
+# Copy custom feature
+RUN mkdir /_features/
+COPY feature_setup.sh /feature_setup.sh
+COPY relations /_features/relations
 
 # Define the command to run your app
 CMD ["bash", "/start.sh"]
