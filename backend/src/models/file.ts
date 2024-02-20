@@ -7,7 +7,6 @@ export interface IFile extends Document {
   title: string;
   description: string;
   published: Date;
-  playlist: mongoose.Schema.Types.ObjectId,
   thumbnail: mongoose.Schema.Types.ObjectId,
 }
 
@@ -17,7 +16,6 @@ const schema = new mongoose.Schema<IFile>({
   title: String,
   description: String,
   published: Date,
-  playlist: { type: mongoose.Schema.Types.ObjectId, ref: 'Playlist' },
   thumbnail: { type: mongoose.Schema.Types.ObjectId, ref: 'Thumbnail' },
 });
 

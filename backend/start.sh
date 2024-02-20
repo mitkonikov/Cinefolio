@@ -15,4 +15,11 @@ fi
 
 echo "Finished setup."
 
+echo "Setting up features..."
+bash /feature_setup.sh
+
+echo "Building..."
+npm run build
+
+echo "Starting server..."
 npm run start

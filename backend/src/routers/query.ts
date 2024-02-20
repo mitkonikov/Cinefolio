@@ -4,6 +4,7 @@ import File from '../models/file.js';
 import Trailer from '../models/trailer.js';
 import Playlist from '../models/playlist.js';
 import Site from '../models/site.js';
+import FileToPlaylist from '../models/file-playlist.js';
 
 const router = express.Router();
 
@@ -42,7 +43,14 @@ router.get('/films/:playlist', async (req, res) => {
       return;
     }
 
-    const files = await File.find({ playlist: playlistDoc._id }).populate('playlist').populate('thumbnail');
+    const files = await FileToPlaylist.find({ playlistId: playlistDoc._id })
+      .populate('fileId').populate({
+        path: 'fileId',
+        populate: {
+          path: 'thumbnail',
+          model: 'Thumbnail',
+        },
+      });
 
     res.json({ files });
   } catch (exception) {

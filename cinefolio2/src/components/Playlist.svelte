@@ -3,7 +3,7 @@
 
 	import { onMount } from 'svelte';
     import Slide from './../components/Slide.svelte';
-	import type { IFilm } from '../types/film';
+	import type { IFilmToPlaylist } from '../types/film';
 	import type { IPlaylist } from '../types/playlist';
 	import { API_URL } from '$lib/constants';
 
@@ -32,7 +32,7 @@
         }
     };
 
-    let videos: IFilm[] = [];
+    let videos: IFilmToPlaylist[] = [];
     $: splideInit = false;
 
     onMount(async () => {
@@ -46,9 +46,9 @@
                 splideInit = true;
             }
 
-            videos.sort((a: IFilm, b: IFilm) => {
-                let dateA = new Date(a.published);
-                let dateB = new Date(b.published);
+            videos.sort((a: IFilmToPlaylist, b: IFilmToPlaylist) => {
+                let dateA = new Date(a.fileId.published);
+                let dateB = new Date(b.fileId.published);
                 return Number(dateB) - Number(dateA);
             });
         });
@@ -62,7 +62,7 @@
             <Splide aria-label="Playlist" options={splideOptions}>
                 {#each videos as video}
                     <SplideSlide>
-                        <Slide data={video}/>
+                        <Slide data={video.fileId}/>
                     </SplideSlide>
                 {/each}
             </Splide>

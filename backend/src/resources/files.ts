@@ -3,6 +3,7 @@ import uploadFeature from '@adminjs/upload';
 import { componentLoader } from '../admin/component-loader.js';
 import File from '../models/file.js';
 import UploadProvider from '../admin/upload-provider.js';
+import { TargetResource } from '../features/mtm.js';
 
 export const files = {
   resource: File,
@@ -29,10 +30,6 @@ export const files = {
       published: {
         type: 'date',
         isRequired: true,
-      },
-      playlist: {
-        type: 'reference',
-        reference: 'Playlist',
       },
       filepath: {
         isVisible: {
@@ -67,5 +64,6 @@ export const files = {
         key: 'filepath',
       },
     }),
+    TargetResource(),
   ],
 };

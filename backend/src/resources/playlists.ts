@@ -1,4 +1,6 @@
 import Playlist from '../models/playlist.js';
+import { FilePlaylist } from '../features/mtm.js';
+import { componentLoader } from '../admin/component-loader.js';
 
 export const playlists = {
   resource: Playlist,
@@ -33,4 +35,7 @@ export const playlists = {
       sortBy: 'order',
     },
   },
+  features: [
+    FilePlaylist(componentLoader),
+  ],
 };
