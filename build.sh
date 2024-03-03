@@ -9,7 +9,7 @@ cp ~/env/mongodb.env ~/cine/mongodb/.env
 echo " > Copy additional scripts..."
 cp ~/env/feature_setup.sh ~/cine/backend/feature_setup.sh
 cp -R ~/env/relations ~/cine/backend/relations
-cp -R ~/env/src/features ~/cine/backend/features
+cp -R ~/env/src/features ~/cine/backend/src/features
 
 # Start the Docker containers
 echo " > Running docker compose up..."
