@@ -14,9 +14,9 @@
     "adminjs": "^7.4.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "express-formidable": "^1.2.0",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.1",
     "mongoose": "^7.6.6",
     "react-slider": "^2.0.6"
   },
