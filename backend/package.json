@@ -17,7 +17,7 @@
     "express": "^4.21.1",
     "express-formidable": "^1.2.0",
     "express-session": "^1.18.1",
-    "mongoose": "^7.6.6",
+    "mongoose": "^8.8.3",
     "react-slider": "^2.0.6"
   },
   "devDependencies": {
