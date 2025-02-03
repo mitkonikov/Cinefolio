@@ -9,7 +9,7 @@ services:
     networks:
       - gateway_app-net
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.runCommand('ping')"]
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://mongodb:27017/test --quiet
       interval: 10s
       timeout: 5s
       retries: 5
