@@ -18,6 +18,9 @@ echo "Finished setup."
 echo "Setting up features..."
 bash /feature_setup.sh
 
+echo "Checking if MongoDB is ready..."
+ping -c 1 mongodb
+
 echo "Building..."
 npm run build
 
