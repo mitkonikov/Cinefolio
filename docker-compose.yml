@@ -2,14 +2,17 @@ services:
   mongodb:
     build:
       context: ./mongodb
-    ports:
-      - "27017:27017"
     volumes:
       - ~/data/db:/data/db
     env_file:
       - ./mongodb/.env
     networks:
       - gateway_app-net
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -20,7 +23,8 @@ services:
       - ~/_logs:/_logs
       - ~/public:/public
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - gateway_app-net
     healthcheck:
