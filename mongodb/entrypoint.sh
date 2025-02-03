@@ -11,4 +11,4 @@ if [ -f "$DB_PATH/mongod.lock" ]; then
 fi
 
 # Start MongoDB
-exec mongod --config /etc/mongod.conf
+exec mongod --config /etc/mongod.conf --bind_ip_all
