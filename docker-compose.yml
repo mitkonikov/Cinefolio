@@ -8,11 +8,6 @@ services:
       - ./mongodb/.env
     networks:
       - gateway_app-net
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://mongodb:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   backend:
     build:
@@ -23,8 +18,7 @@ services:
       - ~/_logs:/_logs
       - ~/public:/public
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
     networks:
       - gateway_app-net
     healthcheck:
