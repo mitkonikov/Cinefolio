@@ -1,14 +1,4 @@
 services:
-  mongodb:
-    build:
-      context: ./mongodb
-    volumes:
-      - ~/data/db:/data/db
-    env_file:
-      - ./mongodb/.env
-    networks:
-      - gateway_app-net
-
   backend:
     build:
       context: ./backend
