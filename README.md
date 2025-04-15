@@ -1,6 +1,6 @@
 # Cinefolio
 
-Personal portfolio website made using Svelte & Firebase. Hosted at [cinefolio.web.app](https://cinefolio.web.app/). The Portfolio is mostly meant to showcase videos, but also in the future we are planning a better support for showcasing coding projects using short videos and/or embedded demos.
+Personal portfolio website made using Svelte & Firebase. Hosted at [cinefolio.web.app](https://cinefolio.web.app/). The Portfolio is meant to showcase short films and videos.
 
 ## Developing
 
@@ -22,7 +22,9 @@ There is automatic GitHub actions for preview of pull request and deployment aft
 ### Backend
 
 The backend is based on AdminJS connected with MongoDB.
-To run the backend and frontend together using docker compose by running:
+To run the backend and frontend together you need a MongoDB instance
+running in the background with the proper `./backend/.env` config to connect to the instance.
+Afterwards, you can run docker compose to start the backend server:
 
 ```sh
 docker compose up --build
