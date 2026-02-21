@@ -1,5 +1,4 @@
 <script lang="ts">
-    export let playlist: IPlaylist;
 
 	import { onMount } from 'svelte';
     import Slide from './../components/Slide.svelte';
@@ -11,8 +10,13 @@
     import '@splidejs/svelte-splide/css';
     import '@splidejs/svelte-splide/css/sea-green';
     import './../css/splide.css';
+    interface Props {
+        playlist: IPlaylist;
+    }
 
-    $: splideOptions = {
+    let { playlist }: Props = $props();
+
+    let splideOptions = $derived({
         type: 'loop',
         perPage: 6,
         drag: false,
@@ -30,10 +34,11 @@
                 perPage: 5,
             },
         }
-    };
+    });
 
-    let videos: IFilmToPlaylist[] = [];
-    $: splideInit = false;
+    let videos: IFilmToPlaylist[] = $state([]);
+    let splideInit = $state(false);
+    
 
     onMount(async () => {
         fetch(`${API_URL}/query/films/${playlist.name}`, {

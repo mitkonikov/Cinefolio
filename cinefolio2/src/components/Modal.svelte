@@ -1,26 +1,42 @@
 <script lang="ts">
-    import Close from "svelte-material-icons/Close.svelte";
-    import IconButton from "./IconButton.svelte";
+	import Close from "svelte-material-icons/Close.svelte";
+	import IconButton from "./IconButton.svelte";
 
-	export let showModal: boolean;
+	interface Props {
+		showModal: boolean;
+		children?: import('svelte').Snippet;
+	}
 
-	let dialog: HTMLDialogElement;
+	let { showModal = $bindable(), children }: Props = $props();
 
-	$: if (dialog && showModal) dialog.showModal();
+	let dialog: HTMLDialogElement = $state();
+
+	$effect(() => {
+		if (!dialog) return;
+
+		if (showModal) {
+			if (!dialog.open) dialog.showModal();
+			return;
+		}
+
+		if (dialog.open) dialog.close();
+	});
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <dialog
 	bind:this={dialog}
-	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
+	onclose={() => (showModal = false)}
+	onclick={(event) => {
+		if (event.target === event.currentTarget) dialog.close();
+	}}
 >
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation>
-		<slot />
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div onclick={(event) => event.stopPropagation()}>
+		{@render children?.()}
 		<hr class="decoration" />
-		<!-- svelte-ignore a11y-autofocus -->
-		<div class="close-btn" autofocus on:click={() => dialog.close()}>
+		<!-- svelte-ignore a11y_autofocus -->
+		<div class="close-btn" autofocus onclick={() => dialog.close()}>
             <IconButton>
                 <Close></Close>
             </IconButton>

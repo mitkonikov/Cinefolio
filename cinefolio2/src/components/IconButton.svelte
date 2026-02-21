@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+    interface Props {
+        size?: string;
+        border?: boolean;
+        onclick?: (event: MouseEvent) => void;
+        children?: import('svelte').Snippet;
+    }
 
-    export let size = "1.5em";
-    export let border = false;
-
-    const dispatch = createEventDispatcher();
+    let { size = "1.5em", border = false, onclick, children }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class={"btn-icon" + (border ? " btn-icon-border" : "")}
     style={`width: ${size}; height: ${size};`}
-    on:click={(event) => dispatch('click', event.detail)}
+    onclick={onclick}
     >
-        <slot/>
+        {@render children?.()}
 </div>
 
 <style>

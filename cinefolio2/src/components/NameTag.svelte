@@ -3,11 +3,12 @@
 	class="noselect"
 	tabindex="0"
 	role="button"
-	on:click={() => {
+	onclick={() => {
 		window.location.href = window.location.origin;
 	}}
-	on:keydown|preventDefault={(event) => {
-		if (event.key == "Enter") {
+	onkeydown={(event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
 			window.location.href = window.location.origin;
 		}
 	}}

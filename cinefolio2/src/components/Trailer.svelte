@@ -5,10 +5,10 @@
     import { type ITrailer } from './../types/film';
 	import { API_URL, STATIC_URL } from '$lib/constants';
 
-    let trailer: ITrailer;
-    let paused = true;
-    let trailerThumbnailStyle = "";
-    let trailerDataLoaded = false;
+    let trailer: ITrailer = $state();
+    let paused = $state(true);
+    let trailerThumbnailStyle = $state("");
+    let trailerDataLoaded = $state(false);
 
     onMount(async () => {
         fetch(`${API_URL}/query/trailers`, {
@@ -31,7 +31,7 @@
 {#if trailerDataLoaded}
     <div class="trailer-frozen trailer-play-container">
         <div class="trailer-play">
-            <IconButton border={true} on:click={() => {
+            <IconButton border={true} onclick={() => {
                 if (trailer.film.link) {
                     window.open(trailer.film.link, "_black");
                 } else {
@@ -46,7 +46,7 @@
 
 <div class="trailer">
     {#if !paused}
-        <!-- svelte-ignore a11y-media-has-caption -->
+        <!-- svelte-ignore a11y_media_has_caption -->
         <video width="100%" autoplay muted bind:paused>
             <source src={getTrailerPath()} type="video/mp4">
             Your browser does not support the video tag.

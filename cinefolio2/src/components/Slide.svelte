@@ -7,9 +7,14 @@
 	import { STATIC_URL } from "$lib/constants";
 	import { onMount } from "svelte";
 
-    export let data: IFilm;
+    interface Props {
+        data: IFilm;
+    }
 
-    $: imgStyle = '';
+    let { data }: Props = $props();
+
+    let imgStyle = $state('');
+    
 
 	// We check if data saver is enabled on the device
     let dataSaver = false;
@@ -57,50 +62,52 @@
         imgStyle = `background-image: url(${thumbnailLink});` + backgroundSize;
     });
 
-    let showModal = false;
+    let showModal = $state(false);
 </script>
 
-<Hoverable let:hovering>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-        class={"slide"}
-        on:click={() => {
-            showModal = true;
-        }}
-    >
-        <div class="frame-container">
-            <div class="thumbnail-container" style={imgStyle}></div>
-            {#if hovering}
-                <div class="slide-overlay"></div>
-                <div class="text-container noselect">
-                    <div>
-                        <div class="text-title">{data.title}</div>
-                        <div class="text-content">{data.description ? data.description : ""}</div>
-                        <div class="timestamp">  Published {new Date(data.published).getFullYear()}</div>
+<Hoverable >
+    {#snippet children({ hovering })}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+            class={"slide"}
+            onclick={() => {
+                showModal = true;
+            }}
+        >
+            <div class="frame-container">
+                <div class="thumbnail-container" style={imgStyle}></div>
+                {#if hovering}
+                    <div class="slide-overlay"></div>
+                    <div class="text-container noselect">
+                        <div>
+                            <div class="text-title">{data.title}</div>
+                            <div class="text-content">{data.description ? data.description : ""}</div>
+                            <div class="timestamp">  Published {new Date(data.published).getFullYear()}</div>
+                        </div>
                     </div>
-                </div>
-            {:else}
-                <div class="text-thumb-container noselect">
-                    <div class="thumbnail-title-container">
-                        {#if data.title.split('-').length == 1}
-                            <div class="text-thumb-title">{data.title}</div>
-                        {:else}
-                            <div class="text-thumb-title">{data.title.split('-')[0]}</div>
-                            <div class="text-thumb-title">{data.title.split('-')[1]}</div>
-                        {/if}
+                {:else}
+                    <div class="text-thumb-container noselect">
+                        <div class="thumbnail-title-container">
+                            {#if data.title.split('-').length == 1}
+                                <div class="text-thumb-title">{data.title}</div>
+                            {:else}
+                                <div class="text-thumb-title">{data.title.split('-')[0]}</div>
+                                <div class="text-thumb-title">{data.title.split('-')[1]}</div>
+                            {/if}
+                        </div>
                     </div>
-                </div>
-            {/if}
+                {/if}
+            </div>
         </div>
-    </div>
+    {/snippet}
 </Hoverable>
 
 <Modal bind:showModal>
     <div class="thumbnail-container">
         <img src={getThumbnailPath()} class="thumbnail" alt={data.title} />
         <div class="play-btn">
-            <IconButton on:click={() => {
+            <IconButton onclick={() => {
                 if (data.link) {
                     window.open(data.link, "_black");
                 } else {

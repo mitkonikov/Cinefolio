@@ -1,22 +1,22 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
+	/** @type {{onclick?: (event: MouseEvent | KeyboardEvent) => void, children?: import('svelte').Snippet}} */
+	let { onclick, children } = $props();
 </script>
 
 <div
 	class="btn-icon"
 	role="button"
 	tabindex="0"
-	on:click={(event) => dispatch('click', event.detail)}
-	on:keydown|preventDefault={(event) => {
-		if (event.key == "Enter") {
-			dispatch('click', event.detail);
+	onclick={(event) => onclick?.(event)}
+	onkeydown={(event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			onclick?.(event);
 		}
 	}}
 >
 	<div class="btn-icon-center">
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
 
