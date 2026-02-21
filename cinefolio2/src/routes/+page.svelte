@@ -5,7 +5,7 @@
 	import { API_URL } from '$lib/constants';
 	import Trailer from '../components/Trailer.svelte';
 
-    let playlists: IPlaylist[] = [];
+    let playlists: IPlaylist[] = $state([]);
 
     onMount(async () => {
         fetch(`${API_URL}/query/playlists/Cinefolio`, {

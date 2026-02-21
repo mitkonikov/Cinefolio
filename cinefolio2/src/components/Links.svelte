@@ -8,16 +8,16 @@
 </script>
 
 <div id="links">
-    <IconButton on:click={() => { window.open('https://www.youtube.com/channel/UCEejMIwMqDOXxl05ZrN-E4g', '_blank'); }}>
+    <IconButton onclick={() => { window.open('https://www.youtube.com/channel/UCEejMIwMqDOXxl05ZrN-E4g', '_blank'); }}>
         <YouTube/>
     </IconButton>
-    <IconButton on:click={() => { window.open('https://github.com/mitkonikov', '_blank'); }}>
+    <IconButton onclick={() => { window.open('https://github.com/mitkonikov', '_blank'); }}>
         <GitHub/>
     </IconButton>
-    <IconButton on:click={() => { window.open('mailto:mitkonikov01@gmail.com', '_blank'); }}>
+    <IconButton onclick={() => { window.open('mailto:mitkonikov01@gmail.com', '_blank'); }}>
         <Gmail/>
     </IconButton>
-    <IconButton on:click={() => { window.open('https://www.facebook.com/mitko.nikov.3', '_blank'); }}>
+    <IconButton onclick={() => { window.open('https://www.facebook.com/mitko.nikov.3', '_blank'); }}>
         <Facebook/>
     </IconButton>
 </div>

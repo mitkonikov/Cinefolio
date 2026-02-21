@@ -1,5 +1,7 @@
 <script>
-	let hovering = false;
+	/** @type {{children?: import('svelte').Snippet<[any]>}} */
+	let { children } = $props();
+	let hovering = $state(false);
 
 	function enter() {
         hovering = true;
@@ -10,9 +12,9 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="hoverable" on:mouseenter={enter} on:mouseleave={leave}>
-	<slot hovering={hovering}></slot>
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="hoverable" onmouseenter={enter} onmouseleave={leave}>
+	{@render children?.({ hovering, })}
 </div>
 
 <style>

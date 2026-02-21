@@ -1,9 +1,13 @@
 <script>
     
-    export let title = '';
-    export let number = '';
-    export let content = '';
-    export let where = '';
+    /** @type {{title?: string, number?: string, content?: string, where?: string, children?: import('svelte').Snippet}} */
+    let {
+        title = '',
+        number = '',
+        content = '',
+        where = '',
+        children
+    } = $props();
 </script>
 
 <div class="footer-snap">
@@ -11,7 +15,7 @@
         <div class="snap-title">{title}</div>
         <div class="snap-number center-vh">{number}</div>
         <div class="snap-content">{content}</div>
-        <slot></slot>
+        {@render children?.()}
     </div>
 </div>
 
