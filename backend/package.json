@@ -13,7 +13,7 @@
     "@adminjs/upload": "^4.0.2",
     "adminjs": "^7.8.17",
     "bcrypt": "^6.0.0",
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.6",
     "express": "^4.21.2",
     "express-formidable": "^1.2.0",
     "express-session": "^1.18.2",
