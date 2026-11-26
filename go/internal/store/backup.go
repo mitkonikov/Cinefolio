@@ -10,11 +10,7 @@ import (
 
 // BackupFile snapshots an existing database without running application migrations.
 func BackupFile(source, output string) error {
-	absolute, err := filepath.Abs(source)
-	if err != nil {
-		return err
-	}
-	db, err := connect(absolute, "mode=ro&_pragma=busy_timeout(5000)")
+	db, err := ReadOnly(source)
 	if err != nil {
 		return err
 	}
@@ -24,6 +20,14 @@ func BackupFile(source, output string) error {
 	}
 	defer sqlDB.Close()
 	return Backup(db, output)
+}
+
+func ReadOnly(source string) (*gorm.DB, error) {
+	absolute, err := filepath.Abs(source)
+	if err != nil {
+		return nil, err
+	}
+	return connect(absolute, "mode=ro&_pragma=busy_timeout(5000)")
 }
 
 func Backup(db *gorm.DB, output string) error {

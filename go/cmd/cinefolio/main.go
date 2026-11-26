@@ -33,6 +33,9 @@ func main() {
 func run(args []string) error {
 	data := valueOr("CINEFOLIO_DATA", "../data")
 	database := filepath.Join(data, "cinefolio.db")
+	if len(args) > 0 && (args[0] == "backup" || args[0] == "verify-data") {
+		return maintenance(data, args)
+	}
 	if len(args) > 0 && args[0] == "backup-db" {
 		options := flag.NewFlagSet("backup-db", flag.ContinueOnError)
 		output := options.String("output", "", "new filename for the database snapshot")

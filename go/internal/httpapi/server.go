@@ -7,6 +7,8 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -38,6 +40,12 @@ func New(db *gorm.DB, storage *media.Storage, site string, config Config) http.H
 	s := &server{auth: auth.New(db), catalog: catalog.New(db, site), media: storage, config: config, logins: rate.NewLimiter(rate.Every(2*time.Second), 8)}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
+		for _, name := range []string{"index.html", "admin/index.html"} {
+			if info, err := os.Stat(filepath.Join(config.WebDir, name)); err != nil || !info.Mode().IsRegular() {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			}
+		}
 		sqlDB, err := db.DB()
 		if err == nil {
 			ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
