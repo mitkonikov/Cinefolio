@@ -1,0 +1,150 @@
+name: Release Cinefolio
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ !github.event.deleted }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      CGO_ENABLED: '0'
+    outputs:
+      tag_object: ${{ steps.tag.outputs.tag_object }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify the tag identifies a commit on master
+        id: tag
+        shell: bash
+        run: |
+          version_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          if [[ ! "$GITHUB_REF_NAME" =~ $version_pattern ]]; then
+            echo 'Release tags must have the form vX.Y.Z.' >&2
+            exit 1
+          fi
+          tag_ref="refs/tags/$GITHUB_REF_NAME"
+          tag_object=$(git rev-parse "$tag_ref")
+          commit=$(git rev-parse "$tag_ref^{commit}")
+          test "$commit" = "$(git rev-parse HEAD)"
+          if ! git merge-base --is-ancestor "$commit" refs/remotes/origin/master; then
+            echo 'The release tag must point to a commit on master.' >&2
+            exit 1
+          fi
+          printf 'commit=%s\ntag_object=%s\n' "$commit" "$tag_object" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.4'
+          cache: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Test the Go backend
+        working-directory: go
+        run: go test ./...
+
+      - name: Test and build the Svelte frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run check
+          npm test -- --run
+          npm run build
+
+      - name: Package the Linux ARM64 release
+        shell: bash
+        env:
+          RELEASE_COMMIT: ${{ steps.tag.outputs.commit }}
+          CGO_ENABLED: '0'
+          GOOS: linux
+          GOARCH: arm64
+        run: |
+          bundle="$RUNNER_TEMP/cinefolio-release"
+          mkdir "$bundle"
+          go -C go build -trimpath -ldflags '-s -w' -o "$bundle/cinefolio" ./cmd/cinefolio
+          cp -R frontend/build "$bundle/web"
+          test -s "$bundle/web/index.html"
+          test -s "$bundle/web/admin/index.html"
+          jq -n --arg version "$GITHUB_REF_NAME" --arg commit "$RELEASE_COMMIT" \
+            '{app:"cinefolio",version:$version,commit:$commit,os:"linux",arch:"arm64"}' > "$bundle/release.json"
+          tar --owner=0 --group=0 --numeric-owner -C "$bundle" \
+            -czf "$RUNNER_TEMP/cinefolio-linux-arm64.tar.gz" release.json cinefolio web
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cinefolio-linux-arm64
+          path: ${{ runner.temp }}/cinefolio-linux-arm64.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: cinefolio-linux-arm64
+          path: ${{ runner.temp }}
+
+      - name: Publish the verified release asset
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG_OBJECT: ${{ needs.build.outputs.tag_object }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          repository="repos/$GITHUB_REPOSITORY"
+          asset_name=cinefolio-linux-arm64.tar.gz
+          archive="$RUNNER_TEMP/$asset_name"
+
+          verify_tag() {
+            remote_tag=$(gh api "$repository/git/ref/tags/$tag" --jq '.object.sha')
+            if [[ "$remote_tag" != "$RELEASE_TAG_OBJECT" ]]; then
+              echo 'The release tag moved after the build. Refusing to publish.' >&2
+              exit 1
+            fi
+          }
+          verify_tag
+
+          existing_tags=$(gh api --paginate "$repository/releases?per_page=100" --jq '.[].tag_name')
+          if grep -Fxq "$tag" <<< "$existing_tags"; then
+            echo 'A release or draft already exists for this tag. Refusing to replace it.' >&2
+            exit 1
+          fi
+
+          release_id=$(gh api "$repository/releases" \
+            -f tag_name="$tag" -f name="$tag" -F draft=true -F generate_release_notes=true --jq '.id')
+          gh release upload "$tag" "$archive" --repo "$GITHUB_REPOSITORY"
+
+          expected_digest="sha256:$(sha256sum "$archive" | cut -d ' ' -f 1)"
+          uploaded_digest=$(gh api "$repository/releases/$release_id/assets" \
+            --jq ".[] | select(.name == \"$asset_name\" and .state == \"uploaded\") | .digest")
+          if [[ "$uploaded_digest" != "$expected_digest" ]]; then
+            echo 'The uploaded asset hash could not be verified. The release remains a draft.' >&2
+            exit 1
+          fi
+
+          verify_tag
+          gh api --method PATCH "$repository/releases/$release_id" -F draft=false --jq '.html_url'

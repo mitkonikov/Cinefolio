@@ -17,20 +17,20 @@ Operational guidance for coding agents working in this repository (`Cinefolio`) 
 5. `npm outdated` (verify no remaining outdated packages)
 
 ### 2) Force install guidance
-- In `cinefolio2`, use `npm install . --force` when peer conflicts block installation.
+- In `frontend`, use `npm install . --force` when peer conflicts block installation.
 - This is expected because of old peer ranges in some dependencies.
 
 ## Known Compatibility Notes
-### `cinefolio2`
-- Peer warning expected: `rxfire@6.1.0` vs `firebase@12.x`.
+### `frontend`
 - Peer warning expected: `svelte-material-icons@3.0.5` vs `svelte@5.x`.
 - These warnings do not necessarily block install when using `--force`, but should be revisited.
 
 ## Validation Checklist
 After dependency or migration work:
-- Frontend (`cinefolio2`):
+- Frontend (`frontend`):
   - `npm run check`
   - `npm run build`
   - optionally `npm run dev`
-- Backend:
-  - `npm run build`
+- Backend (`go`):
+  - `go test ./...`
+  - `go build ./cmd/cinefolio`

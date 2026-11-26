@@ -1,9 +1,0 @@
-node_modules
-dist
-.adminjs
-public/files
-public/thumbs
-public/trailers
-feature_setup.sh
-relations
-src/features/mtm.ts

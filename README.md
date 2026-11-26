@@ -1,39 +1,25 @@
 # Cinefolio
 
-Personal portfolio website made using Svelte & Firebase. Hosted at [cinefolio.web.app](https://cinefolio.web.app/). The Portfolio is meant to showcase short films and videos.
+A film portfolio with a static SvelteKit frontend, a Go API and editor, and a SQLite catalog. The production target is `https://cinefolio.vektor.mk` on deployment host. Go serves the public site, `/admin/`, and the media on the same origin.
 
-## Developing
+## Local development
 
-### First time setup
-
-Run the following commands if you are setting up for the first time on your machine:
+Use Go 1.27.4 and Node.js 24. Run these commands from the repository root.
 
 ```sh
-    cd cinefolio2
-    npm install
+npm --prefix frontend ci
+npm --prefix frontend run build
+go -C go run ./cmd/cinefolio set-password --email owner@example.com
+go -C go run ./cmd/cinefolio
 ```
 
-### Development
-
-Use `npm run dev` for development inside the `/cinefolio2` folder.
-
-There is automatic GitHub actions for preview of pull request and deployment after merging.
-
-### Backend
-
-The backend is based on AdminJS connected with MongoDB.
-To run the backend and frontend together you need a MongoDB instance
-running in the background with the proper `./backend/.env` config to connect to the instance.
-Afterwards, you can run docker compose to start the backend server:
+Open `http://127.0.0.1:5002` or `http://127.0.0.1:5002/admin/`. The password command prompts in the terminal and also resets existing accounts and revokes their sessions. Data defaults to the repository's ignored `data/` directory. To use live Svelte reload, start Go with `CINEFOLIO_ORIGIN=http://127.0.0.1:5173`, then run `npm --prefix frontend run dev` and open that origin.
 
 ```sh
-docker compose up --build
+go -C go test ./...
+npm --prefix frontend run check
+npm --prefix frontend test -- --run
+npm --prefix frontend run build
 ```
 
-It is assumed that the database users are already created and that the `.env` file
-in the `./backend` folder contains the proper credentials.
-
-### Future plans & improvements
-
- - Box for more information
- - Refactor code
+See [deployment and recovery](deploy/README.md) for deployment host, release installer, backups, and the one-time MongoDB import.

@@ -67,3 +67,6 @@ node_modules/
 embed.txt
 
 /data
+/backend/
+/go/cinefolio
+/go/cinefolio.exe
