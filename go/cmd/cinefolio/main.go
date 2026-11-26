@@ -54,6 +54,13 @@ func run(args []string) error {
 	}
 	defer sqlDB.Close()
 	if len(args) > 0 {
+		if args[0] == "import-legacy" {
+			storage, err := media.New(filepath.Join(data, "media"))
+			if err != nil {
+				return err
+			}
+			return importLegacy(db, storage, args[1:])
+		}
 		if args[0] != "set-password" {
 			return fmt.Errorf("unknown command %q", args[0])
 		}
