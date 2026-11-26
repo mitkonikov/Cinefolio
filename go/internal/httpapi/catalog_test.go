@@ -102,8 +102,18 @@ func TestCatalogAndPublicMedia(t *testing.T) {
 	other := index(upload("/api/admin/trailers", `{"filmId":`+film+`,"featured":true}`, "second.mp4", video, 201))
 	do("GET", "/media/"+strconv.FormatUint(created.AssetID, 10), "", "", false, nil, 404)
 	list := index(do("POST", "/api/admin/playlists", `{"name":"Shorts","visible":true,"position":2,"filmIds":[`+film+`]}`, "application/json", true, nil, 201))
+	updateFilm := func(ids string) {
+		do("PUT", "/api/admin/films/"+film, `{"title":"First film","published":"2024-10-01","playlistIds":`+ids+`}`, "application/json", true, nil, 200)
+	}
+	updateFilm("[]")
+	updateFilm("[" + list + "]")
+	rec := do("GET", "/api/admin/films?q=First", "", "", true, nil, 200)
+	var films catalog.Page[catalog.Film]
+	if err := json.Unmarshal(rec.Body.Bytes(), &films); err != nil || len(films.Items) != 1 || len(films.Items[0].Playlists) != 1 {
+		t.Fatalf("admin list: %s (%v)", rec.Body.String(), err)
+	}
 	var portfolio catalog.Portfolio
-	rec := do("GET", "/api/public/portfolio", "", "", false, nil, 200)
+	rec = do("GET", "/api/public/portfolio", "", "", false, nil, 200)
 	if err := json.Unmarshal(rec.Body.Bytes(), &portfolio); err != nil {
 		t.Fatal(err)
 	}

@@ -50,7 +50,8 @@ func page[T any](q *gorm.DB, filter Filter, fields ...string) (Page[T], error) {
 }
 
 func (r *Repository) Films(ctx context.Context, f Filter) (Page[Film], error) {
-	return page[Film](r.db.WithContext(ctx).Model(&Film{}).Preload("Asset").Preload("Thumbnail.Asset").Order("published DESC, id"), f, "title", "description")
+	return page[Film](r.db.WithContext(ctx).Model(&Film{}).Preload("Asset").Preload("Thumbnail.Asset").
+		Preload("Playlists", "site_id = (?)", r.siteID(r.db)).Order("published DESC, id"), f, "title", "description")
 }
 func (r *Repository) Thumbnails(ctx context.Context, f Filter) (Page[Thumbnail], error) {
 	return page[Thumbnail](r.db.WithContext(ctx).Model(&Thumbnail{}).Preload("Asset").Order("title, id"), f, "title")

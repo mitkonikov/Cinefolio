@@ -42,15 +42,45 @@ func (r *Repository) SaveFilm(ctx context.Context, id uint64, in FilmInput, uplo
 			return store.ValidationError("add a video upload or an external link")
 		}
 		if id == 0 {
-			return tx.Create(&film).Error
-		}
-		if err := tx.Model(&film).Select("title", "description", "published", "link", "asset_id", "thumbnail_id").Updates(&film).Error; err != nil {
+			if err := tx.Create(&film).Error; err != nil {
+				return err
+			}
+		} else if err := tx.Model(&film).Select("title", "description", "published", "link", "asset_id", "thumbnail_id").Updates(&film).Error; err != nil {
 			return err
+		}
+		if in.PlaylistIDs != nil {
+			if err := r.replaceFilmMemberships(tx, film.ID, in.PlaylistIDs); err != nil {
+				return err
+			}
 		}
 		obsolete, err = discardAsset(tx, old.AssetID, film.AssetID)
 		return err
 	})
 	return film, obsolete, err
+}
+
+func (r *Repository) replaceFilmMemberships(tx *gorm.DB, filmID uint64, ids []uint64) error {
+	playlists := tx.Session(&gorm.Session{NewDB: true}).Model(&Playlist{}).Where("site_id = (?)", r.siteID(tx))
+	if len(ids) > 0 {
+		var count int64
+		if err := playlists.Session(&gorm.Session{}).Where("id IN ?", ids).Count(&count).Error; err != nil {
+			return err
+		}
+		if int(count) != len(ids) {
+			return store.ValidationError("select distinct playlists belonging to this site")
+		}
+	}
+	if err := tx.Where("film_id = ? AND playlist_id IN (?)", filmID, playlists.Select("id")).Delete(&playlistFilm{}).Error; err != nil {
+		return err
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	rows := make([]playlistFilm, 0, len(ids))
+	for _, id := range ids {
+		rows = append(rows, playlistFilm{PlaylistID: id, FilmID: filmID})
+	}
+	return tx.CreateInBatches(&rows, 100).Error
 }
 
 func (r *Repository) SaveThumbnail(ctx context.Context, id uint64, in ThumbnailInput, upload *media.Asset) (Thumbnail, string, error) {

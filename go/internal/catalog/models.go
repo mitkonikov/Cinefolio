@@ -18,15 +18,17 @@ type Film struct {
 	Asset       *media.Asset `json:"asset,omitempty"`
 	ThumbnailID *uint64      `json:"thumbnailId"`
 	Thumbnail   *Thumbnail   `json:"thumbnail,omitempty"`
+	Playlists   []Playlist   `json:"playlists,omitempty" gorm:"many2many:playlist_films"`
 }
 
 type FilmInput struct {
-	Title        string  `json:"title"`
-	Description  string  `json:"description"`
-	Published    string  `json:"published"`
-	Link         string  `json:"link"`
-	ThumbnailID  *uint64 `json:"thumbnailId"`
-	RemoveUpload bool    `json:"removeUpload"`
+	Title        string   `json:"title"`
+	Description  string   `json:"description"`
+	Published    string   `json:"published"`
+	Link         string   `json:"link"`
+	ThumbnailID  *uint64  `json:"thumbnailId"`
+	RemoveUpload bool     `json:"removeUpload"`
+	PlaylistIDs  []uint64 `json:"playlistIds"`
 }
 
 type Thumbnail struct {
