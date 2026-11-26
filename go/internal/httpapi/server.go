@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"cinefolio/internal/auth"
+	"cinefolio/internal/catalog"
+	"cinefolio/internal/media"
 	"cinefolio/internal/store"
 	"golang.org/x/time/rate"
 	"gorm.io/gorm"
@@ -25,13 +27,15 @@ type Config struct {
 }
 
 type server struct {
-	auth   *auth.Repository
-	config Config
-	logins *rate.Limiter
+	auth    *auth.Repository
+	catalog *catalog.Repository
+	media   *media.Storage
+	config  Config
+	logins  *rate.Limiter
 }
 
-func New(db *gorm.DB, config Config) http.Handler {
-	s := &server{auth: auth.New(db), config: config, logins: rate.NewLimiter(rate.Every(2*time.Second), 8)}
+func New(db *gorm.DB, storage *media.Storage, site string, config Config) http.Handler {
+	s := &server{auth: auth.New(db), catalog: catalog.New(db, site), media: storage, config: config, logins: rate.NewLimiter(rate.Every(2*time.Second), 8)}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		sqlDB, err := db.DB()
@@ -49,6 +53,8 @@ func New(db *gorm.DB, config Config) http.Handler {
 	mux.HandleFunc("POST /api/admin/login", s.login)
 	mux.HandleFunc("GET /api/admin/session", s.protected(func(w http.ResponseWriter, r *http.Request, u auth.User) { respond(w, http.StatusOK, u) }))
 	mux.HandleFunc("POST /api/admin/logout", s.protected(s.logout))
+	s.catalogRoutes(mux)
+	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) { fail(w, store.ErrNotFound) })
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) { fail(w, store.ErrNotFound) })
 	mux.HandleFunc("/media/", http.NotFound)
 	mux.Handle("/", static(config.WebDir))
@@ -153,12 +159,26 @@ func fail(w http.ResponseWriter, err error) {
 		status, message = http.StatusServiceUnavailable, err.Error()
 	case errors.Is(err, store.ErrForbidden):
 		status, message = http.StatusForbidden, err.Error()
-	case errors.Is(err, store.ErrNotFound):
-		status, message = http.StatusNotFound, err.Error()
-	case errors.Is(err, store.ErrConflict), errors.Is(err, gorm.ErrDuplicatedKey), errors.Is(err, gorm.ErrForeignKeyViolated):
-		status, message = http.StatusConflict, "the record conflicts with existing data"
+	case catalog.Missing(err):
+		status, message = http.StatusNotFound, "record not found"
+	case errors.Is(err, store.ErrConflict), sqliteConflict(err):
+		status, message = http.StatusConflict, "the record is in use or conflicts with existing data"
 	default:
 		slog.Error("request failed", "error", err)
 	}
 	respond(w, status, map[string]string{"error": message})
+}
+
+func sqliteConflict(err error) bool {
+	var sqliteErr interface{ Code() int }
+	// SQLite extended constraint codes for unique, primary key, and referenced rows.
+	if !errors.As(err, &sqliteErr) {
+		return false
+	}
+	switch sqliteErr.Code() {
+	case 1555, 1811, 2067, 787:
+		return true
+	default:
+		return false
+	}
 }

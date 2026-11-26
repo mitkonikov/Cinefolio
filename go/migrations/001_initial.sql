@@ -19,20 +19,20 @@ CREATE TABLE sites (
 INSERT INTO sites (name, slug) VALUES ('Cinefolio', 'cinefolio');
 
 CREATE TABLE assets (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     storage_key TEXT NOT NULL UNIQUE,
     filename TEXT NOT NULL,
     content_type TEXT NOT NULL,
     size INTEGER NOT NULL CHECK (size > 0)
 );
 CREATE TABLE thumbnails (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL DEFAULT '',
     crop BOOLEAN NOT NULL DEFAULT 0,
     asset_id INTEGER NOT NULL UNIQUE REFERENCES assets(id)
 );
 CREATE TABLE films (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL CHECK (length(trim(title)) > 0),
     description TEXT NOT NULL DEFAULT '',
     published TEXT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE films (
 );
 CREATE INDEX films_thumbnail ON films(thumbnail_id);
 CREATE TABLE playlists (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     site_id INTEGER NOT NULL REFERENCES sites(id),
     name TEXT NOT NULL,
     visible BOOLEAN NOT NULL DEFAULT 1,
@@ -58,7 +58,7 @@ CREATE TABLE playlist_films (
 );
 CREATE INDEX playlist_films_film ON playlist_films(film_id);
 CREATE TABLE trailers (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     site_id INTEGER NOT NULL REFERENCES sites(id),
     film_id INTEGER NOT NULL REFERENCES films(id) ON DELETE RESTRICT,
     asset_id INTEGER NOT NULL UNIQUE REFERENCES assets(id),
