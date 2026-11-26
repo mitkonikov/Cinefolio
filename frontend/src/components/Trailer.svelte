@@ -1,61 +1,29 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import IconButton from "./../components/IconButton.svelte";
-    import Play from "svelte-material-icons/Play.svelte";
-    import { type ITrailer } from './../types/film';
-	import { API_URL, STATIC_URL } from '$lib/constants';
+    import IconButton from './IconButton.svelte';
+    import Play from 'svelte-material-icons/Play.svelte';
+    import { thumbnailURL, type Trailer } from '$lib/portfolio';
 
-    let trailer: ITrailer = $state();
-    let paused = $state(true);
-    let trailerThumbnailStyle = $state("");
-    let trailerDataLoaded = $state(false);
-
-    onMount(async () => {
-        fetch(`${API_URL}/query/trailers`, {
-            method: 'GET',
-            mode: 'cors'
-        }).then((response) => response.json())
-        .then((value) => {
-            trailer = value.trailer;
-            trailerThumbnailStyle = `background-image: url('${STATIC_URL}/thumbs/${trailer.film.thumbnail.filepath}')`;
-            paused = false;
-            trailerDataLoaded = true;
-        });
-    });
-
-    function getTrailerPath() {
-        return `${STATIC_URL}/trailers/${trailer.filepath}`;
-    }
+    let { trailer }: { trailer: Trailer | null } = $props();
+    let poster = $derived(trailer ? thumbnailURL(trailer.film) : '');
 </script>
 
-{#if trailerDataLoaded}
+{#if trailer}
+    {@const filmURL = trailer.film.link || trailer.film.videoUrl}
     <div class="trailer-frozen trailer-play-container">
         <div class="trailer-play">
-            <IconButton border={true} onclick={() => {
-                if (trailer.film.link) {
-                    window.open(trailer.film.link, "_black");
-                } else {
-                    window.open(`${STATIC_URL}/files/${trailer.film.filepath}`);
-                }
-            }}>
-                <Play></Play>
+            <IconButton border={true} onclick={() => window.open(filmURL, '_blank', 'noopener')}>
+                <Play />
             </IconButton>
         </div>
     </div>
 {/if}
 
 <div class="trailer">
-    {#if !paused}
+    {#if trailer}
         <!-- svelte-ignore a11y_media_has_caption -->
-        <video width="100%" autoplay muted bind:paused>
-            <source src={getTrailerPath()} type="video/mp4">
-            Your browser does not support the video tag.
+        <video width="100%" autoplay muted playsinline poster={poster || undefined}>
+            <source src={trailer.url} type="video/mp4">
         </video>
-    {:else}
-        <div
-            class="trailer-frozen"
-            style={trailerThumbnailStyle}
-        ></div>
     {/if}
 </div>
 

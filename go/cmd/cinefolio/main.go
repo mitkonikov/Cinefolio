@@ -96,7 +96,7 @@ func run(args []string) error {
 		return err
 	}
 	server := &http.Server{Addr: addr, Handler: httpapi.New(db, storage, site, httpapi.Config{
-		WebDir: valueOr("CINEFOLIO_WEB", "../cinefolio2/build"), Origin: origin, SecureCookie: secure,
+		WebDir: valueOr("CINEFOLIO_WEB", "../frontend/build"), Origin: origin, SecureCookie: secure,
 	}), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

@@ -9,7 +9,7 @@
 
 	let { showModal = $bindable(), children }: Props = $props();
 
-	let dialog: HTMLDialogElement = $state();
+	let dialog: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
 		if (!dialog) return;
@@ -28,7 +28,7 @@
 	bind:this={dialog}
 	onclose={() => (showModal = false)}
 	onclick={(event) => {
-		if (event.target === event.currentTarget) dialog.close();
+		if (event.target === event.currentTarget) dialog?.close();
 	}}
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -36,7 +36,7 @@
 		{@render children?.()}
 		<hr class="decoration" />
 		<!-- svelte-ignore a11y_autofocus -->
-		<div class="close-btn" autofocus onclick={() => dialog.close()}>
+		<div class="close-btn" autofocus onclick={() => dialog?.close()}>
             <IconButton>
                 <Close></Close>
             </IconButton>

@@ -1,67 +1,13 @@
 <script lang="ts">
-    import Hoverable from "./Hoverable.svelte";
-	import Modal from './Modal.svelte';
-	import type { IFilm } from "../types/film";
-    import Play from "svelte-material-icons/Play.svelte";
-	import IconButton from "./IconButton.svelte";
-	import { STATIC_URL } from "$lib/constants";
-	import { onMount } from "svelte";
+    import Hoverable from './Hoverable.svelte';
+    import Modal from './Modal.svelte';
+    import Play from 'svelte-material-icons/Play.svelte';
+    import IconButton from './IconButton.svelte';
+    import { thumbnailURL, type Film } from '$lib/portfolio';
 
-    interface Props {
-        data: IFilm;
-    }
-
-    let { data }: Props = $props();
-
-    let imgStyle = $state('');
-    
-
-	// We check if data saver is enabled on the device
-    let dataSaver = false;
-    if ("connection" in navigator) {
-        if ((navigator.connection as any).saveData === true) {
-            console.log("Data saver is enabled.");
-            dataSaver = true;
-        }
-	}
-
-    function getYouTubeID(url: string) {
-        // Regular expression to find YouTube video ID
-        var regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-        var match = url.match(regExp);
-        if (match && match[1]) {
-            return match[1];
-        } else {
-            return null;
-        }
-    }
-
-    function getVimeoID(url: string) {
-        let s = url.split('/');
-        return s[s.length - 1];
-    }
-
-    function getThumbnailPath() {
-        if (data.thumbnail) {
-            return `${STATIC_URL}/thumbs/${data.thumbnail.filepath}`;
-        } else if (data.link) {
-            if (data.link.includes('vimeo')) {
-                const VimeoID = getVimeoID(data.link);
-                return `https://vumbnail.com/${VimeoID}.jpg`;
-            } else {
-                const YoutubeID = getYouTubeID(data.link);
-                return `https://img.youtube.com/vi/${YoutubeID}/sddefault.jpg`;
-            }
-        }
-        return "";
-    }
-
-    onMount(() => {
-        let thumbnailLink = getThumbnailPath();
-        let backgroundSize = (data.thumbnail && data.thumbnail.crop ? ' background-size: 132%' : '');
-        imgStyle = `background-image: url(${thumbnailLink});` + backgroundSize;
-    });
-
+    let { data }: { data: Film } = $props();
+    let thumbnail = $derived(thumbnailURL(data));
+    let imageStyle = $derived(thumbnail ? `background-image: url("${thumbnail}");` : '');
     let showModal = $state(false);
 </script>
 
@@ -76,14 +22,14 @@
             }}
         >
             <div class="frame-container">
-                <div class="thumbnail-container" style={imgStyle}></div>
+                <div class="thumbnail-container" style={imageStyle} style:background-size={data.thumbnail?.crop ? '132%' : null}></div>
                 {#if hovering}
                     <div class="slide-overlay"></div>
                     <div class="text-container noselect">
                         <div>
                             <div class="text-title">{data.title}</div>
                             <div class="text-content">{data.description ? data.description : ""}</div>
-                            <div class="timestamp">  Published {new Date(data.published).getFullYear()}</div>
+                            <div class="timestamp">  Published {data.published.slice(0, 4)}</div>
                         </div>
                     </div>
                 {:else}
@@ -105,14 +51,10 @@
 
 <Modal bind:showModal>
     <div class="thumbnail-container">
-        <img src={getThumbnailPath()} class="thumbnail" alt={data.title} />
+        <img src={thumbnail || undefined} class="thumbnail" alt={data.title} />
         <div class="play-btn">
             <IconButton onclick={() => {
-                if (data.link) {
-                    window.open(data.link, "_black");
-                } else {
-                    window.open(`${STATIC_URL}/files/${data.filepath}`);
-                }
+                window.open(data.link || data.videoUrl, "_blank", "noopener");
             }}>
                 <Play></Play>
             </IconButton>
@@ -122,7 +64,7 @@
         <div>
             <div class="text-title">{data.title}</div>
             <div class="text-content">{data.description ? data.description : ""}</div>
-            <div class="timestamp">  Published {new Date(data.published).getFullYear()}</div>
+            <div class="timestamp">  Published {data.published.slice(0, 4)}</div>
         </div>
     </div>
 </Modal>
