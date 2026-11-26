@@ -291,12 +291,13 @@
                         <label>Description <textarea rows="4" bind:value={draft.description}></textarea></label>
                         <label>Publication date <input type="date" required bind:value={draft.published} /></label>
                         <label>External video URL <input type="url" bind:value={draft.link} /></label>
-                        <label>Thumbnail
-                            <select bind:value={draft.thumbnailId}>
+                        <div class="field">
+                            <label for="film-thumbnail">Thumbnail</label>
+                            <select id="film-thumbnail" bind:value={draft.thumbnailId}>
                                 <option value={null}>Automatic thumbnail</option>
                                 {#each thumbnails as row (row.id)}<option value={row.id}>{name(row)}</option>{/each}
                             </select>
-                        </label>
+                        </div>
                         <RecordChoices title="Playlists" items={playlists.map((row) => ({ id: row.id, text: row.name }))}
                             bind:selected={draft.selected} />
                     {:else if section.key === 'playlists'}
@@ -309,12 +310,13 @@
                         <label>Title <input maxlength="200" bind:value={draft.text} /></label>
                         <label class="check"><input type="checkbox" bind:checked={draft.crop} /> Crop on portfolio</label>
                     {:else}
-                        <label>Full film
-                            <select required bind:value={draft.filmId}>
+                        <div class="field">
+                            <label for="trailer-film">Full film</label>
+                            <select id="trailer-film" required bind:value={draft.filmId}>
                                 <option value={0} disabled>Choose a film</option>
                                 {#each films as row (row.id)}<option value={row.id}>{row.title}</option>{/each}
                             </select>
-                        </label>
+                        </div>
                         <label class="check"><input type="checkbox" bind:checked={draft.featured} /> Featured trailer</label>
                     {/if}
 
@@ -407,7 +409,7 @@
     .login { max-width: 25rem; }
     .login button { justify-self: start; }
     .fields { border: 0; padding: 0; margin: 0.75rem 0; min-inline-size: 0; }
-    label { display: grid; gap: 0.25rem; }
+    label, .field { display: grid; gap: 0.25rem; }
     label.check { display: flex; gap: 0.4rem; align-items: center; }
     input, button, select, textarea { box-sizing: border-box; font: inherit; color: inherit; }
     input:not([type='checkbox']), select, textarea { max-width: 100%; background: #161719; border: 1px solid #696c73;

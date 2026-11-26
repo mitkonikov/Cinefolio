@@ -5,6 +5,7 @@
 
     let { trailer }: { trailer: Trailer | null } = $props();
     let poster = $derived(trailer ? thumbnailURL(trailer.film) : '');
+    let ended = $state(false);
 </script>
 
 {#if trailer}
@@ -19,11 +20,13 @@
 {/if}
 
 <div class="trailer">
-    {#if trailer}
+    {#if trailer && !ended}
         <!-- svelte-ignore a11y_media_has_caption -->
-        <video width="100%" autoplay muted playsinline poster={poster || undefined}>
+        <video width="100%" autoplay muted playsinline poster={poster || undefined} onended={() => ended = true}>
             <source src={trailer.url} type="video/mp4">
         </video>
+    {:else if poster}
+        <div class="trailer-frozen" style:background-image={`url("${poster}")`}></div>
     {/if}
 </div>
 
