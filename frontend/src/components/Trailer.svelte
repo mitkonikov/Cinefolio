@@ -1,15 +1,15 @@
 <script lang="ts">
     import IconButton from './IconButton.svelte';
     import Play from 'svelte-material-icons/Play.svelte';
-    import { thumbnailURL, type Trailer } from '#lib/portfolio.ts';
+    import { playbackURL, thumbnailURL, type Trailer } from '#lib/portfolio.ts';
 
     let { trailer }: { trailer: Trailer | null } = $props();
     let poster = $derived(trailer ? thumbnailURL(trailer.film) : '');
-    let ended = $state(false);
+    let filmURL = $derived(trailer ? playbackURL(trailer.film) : '');
+    let endedURL = $state('');
 </script>
 
-{#if trailer}
-    {@const filmURL = trailer.film.link || trailer.film.videoUrl}
+{#if filmURL}
     <div class="trailer-frozen trailer-play-container">
         <div class="trailer-play">
             <IconButton border={true} onclick={() => window.open(filmURL, '_blank', 'noopener')}>
@@ -20,9 +20,9 @@
 {/if}
 
 <div class="trailer">
-    {#if trailer && !ended}
+    {#if trailer && (endedURL !== trailer.url || !poster)}
         <!-- svelte-ignore a11y_media_has_caption -->
-        <video width="100%" autoplay muted playsinline poster={poster || undefined} onended={() => ended = true}>
+        <video width="100%" autoplay muted playsinline poster={poster || undefined} onended={() => endedURL = trailer?.url ?? ''}>
             <source src={trailer.url} type="video/mp4">
         </video>
     {:else if poster}

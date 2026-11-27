@@ -3,22 +3,29 @@
     import Modal from './Modal.svelte';
     import Play from 'svelte-material-icons/Play.svelte';
     import IconButton from './IconButton.svelte';
-    import { thumbnailURL, type Film } from '#lib/portfolio.ts';
+    import { playbackURL, thumbnailURL, type Film } from '#lib/portfolio.ts';
 
     let { data }: { data: Film } = $props();
     let thumbnail = $derived(thumbnailURL(data));
+    let filmURL = $derived(playbackURL(data));
     let imageStyle = $derived(thumbnail ? `background-image: url("${thumbnail}");` : '');
     let showModal = $state(false);
 </script>
 
 <Hoverable >
     {#snippet children({ hovering })}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
             class={"slide"}
-            onclick={() => {
-                showModal = true;
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-label={data.title}
+            onclick={() => showModal = true}
+            onkeydown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    showModal = true;
+                }
             }}
         >
             <div class="frame-container">
@@ -52,13 +59,13 @@
 <Modal bind:showModal>
     <div class="thumbnail-container">
         <img src={thumbnail || undefined} class="thumbnail" alt={data.title} />
-        <div class="play-btn">
+        {#if filmURL}<div class="play-btn">
             <IconButton onclick={() => {
-                window.open(data.link || data.videoUrl, "_blank", "noopener");
+                window.open(filmURL, "_blank", "noopener");
             }}>
                 <Play></Play>
             </IconButton>
-        </div>
+        </div>{/if}
     </div>
     <div class="modal-info noselect">
         <div>

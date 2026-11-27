@@ -29,10 +29,25 @@ export interface Portfolio {
     playlists: Playlist[];
 }
 
+function externalURL(value: string): URL | undefined {
+    try {
+        const url = new URL(value);
+        if ((url.protocol === 'http:' || url.protocol === 'https:') && !url.username && !url.password) {
+            return url;
+        }
+    } catch {
+        // Older catalog records may contain links rejected by browsers.
+    }
+}
+
+export function playbackURL(film: Film): string {
+    return externalURL(film.link)?.href ?? film.videoUrl;
+}
+
 export function thumbnailURL(film: Film): string {
     if (film.thumbnail) return film.thumbnail.url;
-    if (!film.link) return '';
-    const url = new URL(film.link);
+    const url = externalURL(film.link);
+    if (!url) return '';
     const host = url.hostname.replace(/^www\./, '');
     const parts = url.pathname.split('/').filter(Boolean);
     if (host === 'vimeo.com' || host === 'player.vimeo.com') {

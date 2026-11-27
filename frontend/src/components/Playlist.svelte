@@ -8,7 +8,8 @@
 
     let { playlist }: { playlist: Playlist } = $props();
     const options = {
-        type: 'loop',
+        type: 'slide',
+        rewind: true,
         perPage: 6,
         drag: false,
         breakpoints: {
