@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { APIError, request } from '$lib/api';
+    import { APIError, request } from '#lib/api.ts';
     import {
         choices, deleteRecord, json, list, mediaURL, save,
         type Asset, type AdminFilm, type AdminPlaylist, type AdminThumbnail, type AdminTrailer,
         type Resource, type Resources
-    } from '$lib/admin';
-    import FrameCapture from '$lib/FrameCapture.svelte';
-    import RecordChoices from '$lib/RecordChoices.svelte';
+    } from '#lib/admin.ts';
+    import FrameCapture from '#lib/FrameCapture.svelte';
+    import RecordChoices from '#lib/RecordChoices.svelte';
 
     type Row = Resources[Resource];
     const resources: { key: Resource; label: string; singular: string }[] = [

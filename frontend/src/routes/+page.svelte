@@ -2,8 +2,8 @@
     import { onMount } from 'svelte';
     import Playlist from '../components/Playlist.svelte';
     import Trailer from '../components/Trailer.svelte';
-    import { request } from '$lib/api';
-    import type { Portfolio } from '$lib/portfolio';
+    import { request } from '#lib/api.ts';
+    import type { Portfolio } from '#lib/portfolio.ts';
 
     let portfolio: Portfolio | undefined = $state();
     let failed = $state(false);

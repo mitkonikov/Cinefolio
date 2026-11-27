@@ -1,9 +1,9 @@
 <script lang="ts">
     import Slide from './Slide.svelte';
-    import type { Playlist } from '$lib/portfolio';
+    import type { Playlist } from '#lib/portfolio.ts';
     import { Splide, SplideSlide } from '@splidejs/svelte-splide';
-    import '@splidejs/svelte-splide/css';
-    import '@splidejs/svelte-splide/css/sea-green';
+    import '@splidejs/svelte-splide/css/splide.min.css';
+    import '@splidejs/svelte-splide/css/themes/splide-sea-green.min.css';
     import '../css/splide.css';
 
     let { playlist }: { playlist: Playlist } = $props();

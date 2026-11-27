@@ -1,7 +1,7 @@
 <script lang="ts">
     import IconButton from './IconButton.svelte';
     import Play from 'svelte-material-icons/Play.svelte';
-    import { thumbnailURL, type Trailer } from '$lib/portfolio';
+    import { thumbnailURL, type Trailer } from '#lib/portfolio.ts';
 
     let { trailer }: { trailer: Trailer | null } = $props();
     let poster = $derived(trailer ? thumbnailURL(trailer.film) : '');

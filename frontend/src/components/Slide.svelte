@@ -3,7 +3,7 @@
     import Modal from './Modal.svelte';
     import Play from 'svelte-material-icons/Play.svelte';
     import IconButton from './IconButton.svelte';
-    import { thumbnailURL, type Film } from '$lib/portfolio';
+    import { thumbnailURL, type Film } from '#lib/portfolio.ts';
 
     let { data }: { data: Film } = $props();
     let thumbnail = $derived(thumbnailURL(data));
