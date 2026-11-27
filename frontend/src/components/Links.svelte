@@ -2,7 +2,7 @@
     import IconButton from './../utils/IconButton.svelte';
 
     import YouTube from 'svelte-material-icons/Youtube.svelte';
-    import GitHub from 'svelte-material-icons/GitHub.svelte';
+    import GitHub from 'svelte-material-icons/Github.svelte';
     import Gmail from 'svelte-material-icons/Gmail.svelte'
     import Facebook from 'svelte-material-icons/Facebook.svelte';
 </script>

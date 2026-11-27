@@ -61,13 +61,21 @@ jobs:
         working-directory: go
         run: go test ./...
 
-      - name: Test and build the Svelte frontend
+      - name: Install frontend dependencies
         working-directory: frontend
-        run: |
-          npm ci
-          npm run check
-          npm test -- --run
-          npm run build
+        run: npm ci
+
+      - name: Check frontend types
+        working-directory: frontend
+        run: npm run check
+
+      - name: Test the frontend
+        working-directory: frontend
+        run: npm test -- --run
+
+      - name: Build the static frontend
+        working-directory: frontend
+        run: npm run build
 
       - name: Package the Linux ARM64 release
         shell: bash
