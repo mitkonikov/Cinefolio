@@ -19,7 +19,7 @@ import (
 var (
 	ErrNotFound  = errors.New("resource not found")
 	ErrForbidden = errors.New("access forbidden")
-	ErrConflict  = errors.New("the record changed; reload before saving")
+	ErrConflict  = errors.New("the record changed; reopen it and try again")
 )
 
 type ValidationError string

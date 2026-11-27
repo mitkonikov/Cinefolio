@@ -2,6 +2,11 @@ package catalog
 
 import "cinefolio/internal/media"
 
+type RecordRevision struct {
+	ID       uint64 `json:"id"`
+	Revision uint64 `json:"revision"`
+}
+
 type Site struct {
 	ID   uint64 `json:"id"`
 	Name string `json:"name"`
@@ -9,6 +14,7 @@ type Site struct {
 }
 
 type Film struct {
+	Revision    uint64       `json:"revision" gorm:"default:1"`
 	ID          uint64       `json:"id"`
 	Title       string       `json:"title"`
 	Description string       `json:"description"`
@@ -22,6 +28,7 @@ type Film struct {
 }
 
 type FilmInput struct {
+	Revision     uint64   `json:"revision"`
 	Title        string   `json:"title"`
 	Description  string   `json:"description"`
 	Published    string   `json:"published"`
@@ -32,19 +39,22 @@ type FilmInput struct {
 }
 
 type Thumbnail struct {
-	ID      uint64       `json:"id"`
-	Title   string       `json:"title"`
-	Crop    bool         `json:"crop"`
-	AssetID uint64       `json:"assetId"`
-	Asset   *media.Asset `json:"asset,omitempty"`
+	Revision uint64       `json:"revision" gorm:"default:1"`
+	ID       uint64       `json:"id"`
+	Title    string       `json:"title"`
+	Crop     bool         `json:"crop"`
+	AssetID  uint64       `json:"assetId"`
+	Asset    *media.Asset `json:"asset,omitempty"`
 }
 
 type ThumbnailInput struct {
-	Title string `json:"title"`
-	Crop  bool   `json:"crop"`
+	Revision uint64 `json:"revision"`
+	Title    string `json:"title"`
+	Crop     bool   `json:"crop"`
 }
 
 type Playlist struct {
+	Revision uint64 `json:"revision" gorm:"default:1"`
 	ID       uint64 `json:"id"`
 	SiteID   uint64 `json:"siteId"`
 	Name     string `json:"name"`
@@ -54,6 +64,7 @@ type Playlist struct {
 }
 
 type PlaylistInput struct {
+	Revision uint64   `json:"revision"`
 	Name     string   `json:"name"`
 	Visible  bool     `json:"visible"`
 	Position int      `json:"position"`
@@ -61,6 +72,7 @@ type PlaylistInput struct {
 }
 
 type Trailer struct {
+	Revision uint64       `json:"revision" gorm:"default:1"`
 	ID       uint64       `json:"id"`
 	SiteID   uint64       `json:"siteId"`
 	FilmID   uint64       `json:"filmId"`
@@ -71,6 +83,7 @@ type Trailer struct {
 }
 
 type TrailerInput struct {
+	Revision uint64 `json:"revision"`
 	FilmID   uint64 `json:"filmId"`
 	Featured bool   `json:"featured"`
 }

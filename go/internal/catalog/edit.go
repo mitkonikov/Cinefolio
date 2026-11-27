@@ -3,6 +3,7 @@ package catalog
 import (
 	"context"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,7 +22,7 @@ func (r *Repository) SaveFilm(ctx context.Context, id uint64, in FilmInput, uplo
 	}
 	if film.Link != "" {
 		link, err := url.Parse(film.Link)
-		if err != nil || len(film.Link) > 4096 || (link.Scheme != "https" && link.Scheme != "http") || link.Hostname() == "" || link.User != nil {
+		if err != nil || len(film.Link) > 4096 || (link.Scheme != "https" && link.Scheme != "http") || link.Hostname() == "" || link.User != nil || !validPort(link) {
 			return film, "", store.ValidationError("enter an HTTP or HTTPS film link")
 		}
 	}
@@ -30,6 +31,9 @@ func (r *Repository) SaveFilm(ctx context.Context, id uint64, in FilmInput, uplo
 		var old Film
 		if id != 0 {
 			if err := tx.Take(&old, id).Error; err != nil {
+				return err
+			}
+			if err := requireRevision(old.Revision, in.Revision); err != nil {
 				return err
 			}
 		}
@@ -54,9 +58,21 @@ func (r *Repository) SaveFilm(ctx context.Context, id uint64, in FilmInput, uplo
 			}
 		}
 		obsolete, err = discardAsset(tx, old.AssetID, film.AssetID)
-		return err
+		if err != nil {
+			return err
+		}
+		return readRevision(tx, &film, film.ID, &film.Revision)
 	})
 	return film, obsolete, err
+}
+
+func validPort(link *url.URL) bool {
+	port := link.Port()
+	if port == "" {
+		return true
+	}
+	_, err := strconv.ParseUint(port, 10, 16)
+	return err == nil
 }
 
 func (r *Repository) replaceFilmMemberships(tx *gorm.DB, filmID uint64, ids []uint64) error {
@@ -70,17 +86,15 @@ func (r *Repository) replaceFilmMemberships(tx *gorm.DB, filmID uint64, ids []ui
 			return store.ValidationError("select distinct playlists belonging to this site")
 		}
 	}
-	if err := tx.Where("film_id = ? AND playlist_id IN (?)", filmID, playlists.Select("id")).Delete(&playlistFilm{}).Error; err != nil {
-		return err
-	}
-	if len(ids) == 0 {
-		return nil
+	stale := tx.Where("film_id = ? AND playlist_id IN (?)", filmID, playlists.Select("id"))
+	if len(ids) > 0 {
+		stale = stale.Where("playlist_id NOT IN ?", ids)
 	}
 	rows := make([]playlistFilm, 0, len(ids))
 	for _, id := range ids {
 		rows = append(rows, playlistFilm{PlaylistID: id, FilmID: filmID})
 	}
-	return tx.CreateInBatches(&rows, 100).Error
+	return syncMemberships(tx, stale, rows)
 }
 
 func (r *Repository) SaveThumbnail(ctx context.Context, id uint64, in ThumbnailInput, upload *media.Asset) (Thumbnail, string, error) {
@@ -94,6 +108,9 @@ func (r *Repository) SaveThumbnail(ctx context.Context, id uint64, in ThumbnailI
 		if id != 0 {
 			var current Thumbnail
 			if err := tx.Take(&current, id).Error; err != nil {
+				return err
+			}
+			if err := requireRevision(current.Revision, in.Revision); err != nil {
 				return err
 			}
 			old = &current.AssetID
@@ -113,16 +130,35 @@ func (r *Repository) SaveThumbnail(ctx context.Context, id uint64, in ThumbnailI
 			return err
 		}
 		obsolete, err = discardAsset(tx, old, next)
-		return err
+		if err != nil {
+			return err
+		}
+		return readRevision(tx, &t, t.ID, &t.Revision)
 	})
 	return t, obsolete, err
 }
 
-func (r *Repository) EnableCrop(ctx context.Context, ids []uint64) error {
-	if len(ids) == 0 || len(ids) > 200 {
+func (r *Repository) EnableCrop(ctx context.Context, records []RecordRevision) error {
+	if len(records) == 0 || len(records) > 200 {
 		return store.ValidationError("select between 1 and 200 thumbnails")
 	}
-	return r.db.WithContext(ctx).Model(&Thumbnail{}).Where("id IN ?", ids).Update("crop", true).Error
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, expected := range records {
+			var current Thumbnail
+			if err := tx.Take(&current, expected.ID).Error; err != nil {
+				return err
+			}
+			if err := requireRevision(current.Revision, expected.Revision); err != nil {
+				return err
+			}
+			if !current.Crop {
+				if err := tx.Model(&current).Update("crop", true).Error; err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
 }
 
 func (r *Repository) SaveTrailer(ctx context.Context, id uint64, in TrailerInput, upload *media.Asset) (Trailer, string, error) {
@@ -141,6 +177,9 @@ func (r *Repository) SaveTrailer(ctx context.Context, id uint64, in TrailerInput
 		if id != 0 {
 			var current Trailer
 			if err := tx.Where("site_id = ?", siteID).Take(&current, id).Error; err != nil {
+				return err
+			}
+			if err := requireRevision(current.Revision, in.Revision); err != nil {
 				return err
 			}
 			old = &current.AssetID
@@ -167,26 +206,33 @@ func (r *Repository) SaveTrailer(ctx context.Context, id uint64, in TrailerInput
 			t.Featured = true
 		}
 		obsolete, err = discardAsset(tx, old, next)
-		return err
+		if err != nil {
+			return err
+		}
+		return readRevision(tx, &t, t.ID, &t.Revision)
 	})
 	return t, obsolete, err
 }
 
-func (r *Repository) DeleteFilm(ctx context.Context, id uint64) (string, error) {
-	return removeRecord(r.db.WithContext(ctx), id, func(f Film) *uint64 { return f.AssetID })
+func (r *Repository) DeleteFilm(ctx context.Context, id, revision uint64) (string, error) {
+	return removeRecord(r.db.WithContext(ctx), id, revision, func(f Film) (uint64, *uint64) { return f.Revision, f.AssetID })
 }
-func (r *Repository) DeleteThumbnail(ctx context.Context, id uint64) (string, error) {
-	return removeRecord(r.db.WithContext(ctx), id, func(t Thumbnail) *uint64 { return &t.AssetID })
+func (r *Repository) DeleteThumbnail(ctx context.Context, id, revision uint64) (string, error) {
+	return removeRecord(r.db.WithContext(ctx), id, revision, func(t Thumbnail) (uint64, *uint64) { return t.Revision, &t.AssetID })
 }
-func (r *Repository) DeleteTrailer(ctx context.Context, id uint64) (string, error) {
-	return removeRecord(r.db.WithContext(ctx).Where("site_id = (?)", r.siteID(r.db)), id, func(t Trailer) *uint64 { return &t.AssetID })
+func (r *Repository) DeleteTrailer(ctx context.Context, id, revision uint64) (string, error) {
+	return removeRecord(r.db.WithContext(ctx).Where("site_id = (?)", r.siteID(r.db)), id, revision, func(t Trailer) (uint64, *uint64) { return t.Revision, &t.AssetID })
 }
 
-func removeRecord[T any](db *gorm.DB, id uint64, assetOf func(T) *uint64) (string, error) {
+func removeRecord[T any](db *gorm.DB, id, revision uint64, fields func(T) (uint64, *uint64)) (string, error) {
 	var obsolete string
 	err := db.Transaction(func(tx *gorm.DB) error {
 		var record T
 		if err := tx.Take(&record, id).Error; err != nil {
+			return err
+		}
+		current, asset := fields(record)
+		if err := requireRevision(current, revision); err != nil {
 			return err
 		}
 		tx = tx.Session(&gorm.Session{NewDB: true})
@@ -194,7 +240,7 @@ func removeRecord[T any](db *gorm.DB, id uint64, assetOf func(T) *uint64) (strin
 			return err
 		}
 		var err error
-		obsolete, err = discardAsset(tx, assetOf(record), nil)
+		obsolete, err = discardAsset(tx, asset, nil)
 		return err
 	})
 	return obsolete, err

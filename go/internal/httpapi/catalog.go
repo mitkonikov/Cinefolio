@@ -40,7 +40,9 @@ func (s *server) catalogRoutes(mux *http.ServeMux) {
 	s.registerMediaEditor(mux, "trailers", editMedia(s, s.catalog.SaveTrailer, media.Trailer), s.catalog.DeleteTrailer)
 	mux.HandleFunc("POST /api/admin/playlists", s.protected(s.savePlaylist))
 	mux.HandleFunc("PUT /api/admin/playlists/{id}", s.protected(s.savePlaylist))
-	mux.HandleFunc("DELETE /api/admin/playlists/{id}", s.protected(remove(s, func(ctx context.Context, id uint64) (string, error) { return "", s.catalog.DeletePlaylist(ctx, id) })))
+	mux.HandleFunc("DELETE /api/admin/playlists/{id}", s.protected(remove(s, func(ctx context.Context, id, revision uint64) (string, error) {
+		return "", s.catalog.DeletePlaylist(ctx, id, revision)
+	})))
 	mux.HandleFunc("PUT /api/admin/playlists/{id}/films/{film}", s.protected(s.membership))
 	mux.HandleFunc("DELETE /api/admin/playlists/{id}/films/{film}", s.protected(s.membership))
 	mux.HandleFunc("POST /api/admin/thumbnails/enable-crop", s.protected(s.enableCrop))
@@ -92,7 +94,7 @@ func list[T any](find func(context.Context, catalog.Filter) (catalog.Page[T], er
 	}
 }
 
-func (s *server) registerMediaEditor(mux *http.ServeMux, name string, save adminHandler, deleteRecord func(context.Context, uint64) (string, error)) {
+func (s *server) registerMediaEditor(mux *http.ServeMux, name string, save adminHandler, deleteRecord func(context.Context, uint64, uint64) (string, error)) {
 	base := "/api/admin/" + name
 	mux.HandleFunc("POST "+base, s.protected(save))
 	mux.HandleFunc("PUT "+base+"/{id}", s.protected(save))
@@ -183,14 +185,19 @@ func editMedia[I, R any](s *server, save func(context.Context, uint64, I, *media
 	}
 }
 
-func remove(s *server, deleteRecord func(context.Context, uint64) (string, error)) adminHandler {
+func remove(s *server, deleteRecord func(context.Context, uint64, uint64) (string, error)) adminHandler {
 	return func(w http.ResponseWriter, r *http.Request, _ auth.User) {
 		id, err := idParam(r, "id")
 		if err != nil {
 			fail(w, err)
 			return
 		}
-		obsolete, err := deleteRecord(r.Context(), id)
+		revision, err := strconv.ParseUint(r.URL.Query().Get("revision"), 10, 63)
+		if err != nil || revision == 0 {
+			fail(w, store.ValidationError("record revision is required"))
+			return
+		}
+		obsolete, err := deleteRecord(r.Context(), id, revision)
 		if err != nil {
 			fail(w, err)
 			return
@@ -251,13 +258,13 @@ func (s *server) membership(w http.ResponseWriter, r *http.Request, _ auth.User)
 
 func (s *server) enableCrop(w http.ResponseWriter, r *http.Request, _ auth.User) {
 	var input struct {
-		IDs []uint64 `json:"ids"`
+		Records []catalog.RecordRevision `json:"records"`
 	}
 	if err := decode(w, r, &input); err != nil {
 		fail(w, err)
 		return
 	}
-	if err := s.catalog.EnableCrop(r.Context(), input.IDs); err != nil {
+	if err := s.catalog.EnableCrop(r.Context(), input.Records); err != nil {
 		fail(w, err)
 		return
 	}

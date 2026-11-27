@@ -157,8 +157,7 @@
             link: record && 'link' in record ? record.link : '',
             thumbnailId: record && 'thumbnailId' in record ? record.thumbnailId : null,
             removeUpload: false,
-            selected: record && 'films' in record ? (record.films ?? []).map((film) => film.id)
-                : record && 'playlists' in record ? (record.playlists ?? []).map((item) => item.id) : [],
+            selected: membershipIDs(record),
             visible: record && 'visible' in record ? record.visible : true,
             position: record && 'position' in record ? record.position : 0,
             crop: record && 'crop' in record ? record.crop : false,
@@ -181,18 +180,28 @@
         } finally { saving = false; }
     }
 
-    function input() {
+    function membershipIDs(record: Row | undefined) {
+        if (record && 'films' in record) return (record.films ?? []).map((film) => film.id);
+        if (record && 'published' in record) return (record.playlists ?? []).map((playlist) => playlist.id);
+        return [];
+    }
+
+    function input(record: Row | undefined) {
+        const revision = record?.revision;
+        const original = new Set(membershipIDs(record));
+        const changed = original.size !== draft.selected.length || draft.selected.some((id) => !original.has(id));
+        const memberships = changed ? draft.selected : undefined;
         switch (section.key) {
             case 'films': return {
-                title: draft.text, description: draft.description, published: draft.published,
+                revision, title: draft.text, description: draft.description, published: draft.published,
                 link: draft.link, thumbnailId: draft.thumbnailId, removeUpload: draft.removeUpload,
-                playlistIds: draft.selected
+                playlistIds: memberships
             };
             case 'playlists': return {
-                name: draft.text, position: draft.position, visible: draft.visible, filmIds: draft.selected
+                revision, name: draft.text, position: draft.position, visible: draft.visible, filmIds: memberships
             };
-            case 'thumbnails': return { title: draft.text, crop: draft.crop };
-            case 'trailers': return { filmId: draft.filmId, featured: draft.featured };
+            case 'thumbnails': return { revision, title: draft.text, crop: draft.crop };
+            case 'trailers': return { revision, filmId: draft.filmId, featured: draft.featured };
         }
     }
 
@@ -202,11 +211,15 @@
         saving = true;
         error = '';
         try {
-            await save(section.key, selection === 'new' ? undefined : selection.id, input(), file);
+            const record = selection === 'new' ? undefined : selection;
+            await save(section.key, record?.id, input(record), file);
             notice = 'Saved.';
             closeEditor();
             await refresh();
-        } catch (cause) { showError(cause); }
+        } catch (cause) {
+            showError(cause);
+            if (cause instanceof APIError && cause.status === 409) await refresh();
+        }
         finally { saving = false; }
     }
 
@@ -215,11 +228,14 @@
         saving = true;
         error = '';
         try {
-            await deleteRecord(section.key, pendingDelete.id);
+            await deleteRecord(section.key, pendingDelete);
             pendingDelete = undefined;
             notice = 'Deleted.';
             await refresh();
-        } catch (cause) { showError(cause); }
+        } catch (cause) {
+            showError(cause);
+            if (cause instanceof APIError && cause.status === 409) await refresh();
+        }
         finally { saving = false; }
     }
 
@@ -227,10 +243,15 @@
         saving = true;
         error = '';
         try {
-            await request('/api/admin/thumbnails/enable-crop', json('POST', { ids: marked }));
+            const records = items.filter((row) => marked.includes(row.id))
+                .map(({ id, revision }) => ({ id, revision }));
+            await request('/api/admin/thumbnails/enable-crop', json('POST', { records }));
             notice = 'Cropping enabled.';
             await refresh();
-        } catch (cause) { showError(cause); }
+        } catch (cause) {
+            showError(cause);
+            if (cause instanceof APIError && cause.status === 409) await refresh();
+        }
         finally { saving = false; }
     }
 

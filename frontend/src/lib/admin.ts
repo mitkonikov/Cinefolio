@@ -6,8 +6,12 @@ export interface Asset {
     contentType: string;
     size: number;
 }
-export interface AdminFilm {
+interface RevisionedRecord {
     id: number;
+    revision: number;
+}
+
+export interface AdminFilm extends RevisionedRecord {
     title: string;
     description: string;
     published: string;
@@ -16,21 +20,18 @@ export interface AdminFilm {
     thumbnailId: number | null;
     playlists?: AdminPlaylist[];
 }
-export interface AdminPlaylist {
-    id: number;
+export interface AdminPlaylist extends RevisionedRecord {
     name: string;
     position: number;
     visible: boolean;
     films: AdminFilm[] | null;
 }
-export interface AdminThumbnail {
-    id: number;
+export interface AdminThumbnail extends RevisionedRecord {
     title: string;
     crop: boolean;
     asset?: Asset;
 }
-export interface AdminTrailer {
-    id: number;
+export interface AdminTrailer extends RevisionedRecord {
     filmId: number;
     film?: AdminFilm;
     asset?: Asset;
@@ -84,6 +85,6 @@ export function save(resource: Resource, id: number | undefined, input: unknown,
     return request(url, { method, body });
 }
 
-export function deleteRecord(resource: Resource, id: number) {
-    return request(`${base}/${resource}/${id}`, { method: 'DELETE' });
+export function deleteRecord(resource: Resource, record: RevisionedRecord) {
+    return request(`${base}/${resource}/${record.id}?revision=${record.revision}`, { method: 'DELETE' });
 }

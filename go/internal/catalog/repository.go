@@ -42,10 +42,12 @@ func page[T any](q *gorm.DB, filter Filter, fields ...string) (Page[T], error) {
 		}
 		q = q.Where(strings.Join(conditions, " OR "), args...)
 	}
-	if err := q.Session(&gorm.Session{}).Count(&p.Total).Error; err != nil {
-		return p, err
-	}
-	err := q.Offset(filter.Offset).Limit(filter.Limit).Find(&p.Items).Error
+	err := q.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Session(&gorm.Session{}).Count(&p.Total).Error; err != nil {
+			return err
+		}
+		return tx.Offset(filter.Offset).Limit(filter.Limit).Find(&p.Items).Error
+	})
 	return p, err
 }
 
@@ -113,36 +115,69 @@ func (r *Repository) SavePlaylist(ctx context.Context, id uint64, in PlaylistInp
 				return err
 			}
 		} else {
+			var current Playlist
+			if err := tx.Where("site_id = ?", siteID).Take(&current, id).Error; err != nil {
+				return err
+			}
+			if err := requireRevision(current.Revision, in.Revision); err != nil {
+				return err
+			}
 			result := tx.Model(&p).Where("site_id = ?", siteID).Select("name", "visible", "position").Updates(&p)
 			if err := changed(result); err != nil {
 				return err
 			}
 		}
-		if in.FilmIDs == nil {
-			return nil
-		} // Optional on edit, so metadata changes can leave memberships intact.
-		if err := tx.Where("playlist_id = ?", p.ID).Delete(&playlistFilm{}).Error; err != nil {
-			return err
-		}
-		seen := make(map[uint64]bool, len(in.FilmIDs))
-		links := make([]playlistFilm, 0, len(in.FilmIDs))
-		for _, filmID := range in.FilmIDs {
-			if seen[filmID] {
-				return store.ValidationError("duplicate film membership")
+		if in.FilmIDs != nil {
+			seen := make(map[uint64]bool, len(in.FilmIDs))
+			links := make([]playlistFilm, 0, len(in.FilmIDs))
+			for _, filmID := range in.FilmIDs {
+				if seen[filmID] {
+					return store.ValidationError("duplicate film membership")
+				}
+				seen[filmID] = true
+				links = append(links, playlistFilm{PlaylistID: p.ID, FilmID: filmID})
 			}
-			seen[filmID] = true
-			links = append(links, playlistFilm{PlaylistID: p.ID, FilmID: filmID})
+			stale := tx.Where("playlist_id = ?", p.ID)
+			if len(in.FilmIDs) > 0 {
+				stale = stale.Where("film_id NOT IN ?", in.FilmIDs)
+			}
+			if err := syncMemberships(tx, stale, links); err != nil {
+				return err
+			}
 		}
-		if len(links) == 0 {
-			return nil
-		}
-		return tx.CreateInBatches(&links, 100).Error
+		return readRevision(tx, &p, p.ID, &p.Revision)
 	})
 	return p, err
 }
 
-func (r *Repository) DeletePlaylist(ctx context.Context, id uint64) error {
-	return changed(r.db.WithContext(ctx).Where("site_id = (?)", r.siteID(r.db)).Delete(&Playlist{}, id))
+func (r *Repository) DeletePlaylist(ctx context.Context, id, revision uint64) error {
+	_, err := removeRecord(r.db.WithContext(ctx).Where("site_id = (?)", r.siteID(r.db)),
+		id, revision, func(p Playlist) (uint64, *uint64) { return p.Revision, nil })
+	return err
+}
+
+func syncMemberships(tx, stale *gorm.DB, links []playlistFilm) error {
+	if err := stale.Delete(&playlistFilm{}).Error; err != nil {
+		return err
+	}
+	if len(links) == 0 {
+		return nil
+	}
+	return tx.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(&links, 100).Error
+}
+
+func requireRevision(current, expected uint64) error {
+	if expected == 0 {
+		return store.ValidationError("record revision is required")
+	}
+	if current != expected {
+		return store.ErrConflict
+	}
+	return nil
+}
+
+func readRevision(tx *gorm.DB, model any, id uint64, revision *uint64) error {
+	return tx.Model(model).Where("id = ?", id).Select("revision").Scan(revision).Error
 }
 
 func changed(result *gorm.DB) error {
