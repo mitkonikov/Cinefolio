@@ -33,6 +33,12 @@ func main() {
 func run(args []string) error {
 	data := valueOr("CINEFOLIO_DATA", "../data")
 	database := filepath.Join(data, "cinefolio.db")
+	if len(args) > 0 && args[0] == "purge-sessions" {
+		if len(args) != 1 {
+			return errors.New("usage: cinefolio purge-sessions")
+		}
+		return store.PurgeSessions(database)
+	}
 	if len(args) > 0 && (args[0] == "backup" || args[0] == "verify-data") {
 		return maintenance(data, args)
 	}
@@ -97,6 +103,10 @@ func run(args []string) error {
 	if err != nil {
 		return fmt.Errorf("CINEFOLIO_SECURE_COOKIE: %w", err)
 	}
+	trustProxy, err := strconv.ParseBool(valueOr("CINEFOLIO_TRUST_LOOPBACK_PROXY", "false"))
+	if err != nil {
+		return fmt.Errorf("CINEFOLIO_TRUST_LOOPBACK_PROXY: %w", err)
+	}
 	storage, err := media.New(filepath.Join(data, "media"))
 	if err != nil {
 		return err
@@ -106,7 +116,7 @@ func run(args []string) error {
 		return err
 	}
 	server := &http.Server{Addr: addr, Handler: httpapi.New(db, storage, site, httpapi.Config{
-		WebDir: valueOr("CINEFOLIO_WEB", "../frontend/build"), Origin: origin, SecureCookie: secure,
+		WebDir: valueOr("CINEFOLIO_WEB", "../frontend/build"), Origin: origin, SecureCookie: secure, TrustLoopbackProxy: trustProxy,
 	}), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

@@ -10,6 +10,11 @@ import (
 
 // BackupFile snapshots an existing database without running application migrations.
 func BackupFile(source, output string) error {
+	scratch, err := os.MkdirTemp(filepath.Dir(output), ".cinefolio-snapshot-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(scratch)
 	db, err := ReadOnly(source)
 	if err != nil {
 		return err
@@ -19,7 +24,33 @@ func BackupFile(source, output string) error {
 		return err
 	}
 	defer sqlDB.Close()
-	return Backup(db, output)
+	staged := filepath.Join(scratch, "snapshot.db")
+	if err := snapshot(db, staged); err != nil {
+		return err
+	}
+	if err := PurgeSessions(staged); err != nil {
+		return fmt.Errorf("sanitize backup sessions: %w", err)
+	}
+	// Publish only after sanitizing and refuse to overwrite an existing backup.
+	return os.Link(staged, output)
+}
+
+// PurgeSessions opens an existing database without applying migrations.
+func PurgeSessions(source string) error {
+	absolute, err := filepath.Abs(source)
+	if err != nil {
+		return err
+	}
+	db, err := connect(absolute, "mode=rw&_pragma=busy_timeout(5000)&_pragma=secure_delete(ON)")
+	if err != nil {
+		return err
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	defer sqlDB.Close()
+	return db.Exec("DELETE FROM sessions").Error
 }
 
 func ReadOnly(source string) (*gorm.DB, error) {
@@ -30,7 +61,7 @@ func ReadOnly(source string) (*gorm.DB, error) {
 	return connect(absolute, "mode=ro&_pragma=busy_timeout(5000)")
 }
 
-func Backup(db *gorm.DB, output string) error {
+func snapshot(db *gorm.DB, output string) error {
 	path, err := filepath.Abs(output)
 	if err != nil {
 		return err

@@ -16,16 +16,16 @@ import (
 	"cinefolio/internal/catalog"
 	"cinefolio/internal/media"
 	"cinefolio/internal/store"
-	"golang.org/x/time/rate"
 	"gorm.io/gorm"
 )
 
 const cookieName = "cinefolio_session"
 
 type Config struct {
-	WebDir       string
-	Origin       string
-	SecureCookie bool
+	WebDir             string
+	Origin             string
+	SecureCookie       bool
+	TrustLoopbackProxy bool
 }
 
 type server struct {
@@ -33,11 +33,11 @@ type server struct {
 	catalog *catalog.Repository
 	media   *media.Storage
 	config  Config
-	logins  *rate.Limiter
+	logins  loginLimits
 }
 
 func New(db *gorm.DB, storage *media.Storage, site string, config Config) http.Handler {
-	s := &server{auth: auth.New(db), catalog: catalog.New(db, site), media: storage, config: config, logins: rate.NewLimiter(rate.Every(2*time.Second), 8)}
+	s := &server{auth: auth.New(db), catalog: catalog.New(db, site), media: storage, config: config}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		for _, name := range []string{"index.html", "admin/index.html"} {
@@ -82,7 +82,8 @@ func New(db *gorm.DB, storage *media.Storage, site string, config Config) http.H
 }
 
 func (s *server) login(w http.ResponseWriter, r *http.Request) {
-	if !s.logins.Allow() {
+	if !s.logins.allow(loginIP(r, s.config.TrustLoopbackProxy), time.Now()) {
+		w.Header().Set("Retry-After", "2")
 		respond(w, http.StatusTooManyRequests, map[string]string{"error": "try again shortly"})
 		return
 	}
@@ -169,7 +170,9 @@ func fail(w http.ResponseWriter, err error) {
 		status, message = http.StatusForbidden, err.Error()
 	case catalog.Missing(err):
 		status, message = http.StatusNotFound, "record not found"
-	case errors.Is(err, store.ErrConflict), sqliteConflict(err):
+	case errors.Is(err, store.ErrConflict):
+		status, message = http.StatusConflict, err.Error()
+	case sqliteConflict(err):
 		status, message = http.StatusConflict, "the record is in use or conflicts with existing data"
 	default:
 		slog.Error("request failed", "error", err)
