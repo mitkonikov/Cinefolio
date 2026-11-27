@@ -1,6 +1,6 @@
 # Cinefolio
 
-A film portfolio with a static SvelteKit frontend, a Go API and editor, and a SQLite catalog. The production target is `https://cinefolio.vektor.mk` on deployment host. Go serves the public site, `/admin/`, and the media on the same origin.
+A film portfolio with a static SvelteKit frontend, a Go API and editor, and a SQLite catalog. Go serves the public site, /admin/, and media on the same origin.
 
 ## Local development
 
@@ -21,5 +21,3 @@ npm --prefix frontend run check
 npm --prefix frontend test -- --run
 npm --prefix frontend run build
 ```
-
-See [deployment and recovery](deploy/README.md) for deployment host, release installer, backups, and the one-time MongoDB import.
