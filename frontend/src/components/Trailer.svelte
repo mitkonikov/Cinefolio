@@ -22,15 +22,13 @@
 <div class="trailer">
     {#if trailer && (endedURL !== trailer.url || !poster)}
         <!-- svelte-ignore a11y_media_has_caption -->
-        <video width="100%" autoplay muted playsinline poster={poster || undefined} onended={() => endedURL = trailer?.url ?? ''}>
+        <video autoplay muted playsinline poster={poster || undefined} onended={() => endedURL = trailer?.url ?? ''}>
             <source src={trailer.url} type="video/mp4">
         </video>
     {:else if poster}
         <div class="trailer-frozen" style:background-image={`url("${poster}")`}></div>
     {/if}
 </div>
-
-<div class="fade-decoration"></div>
 
 <div class="noselect" id="logo">
     <div id="main-logo">cinefolio</div>
@@ -39,15 +37,6 @@
 </div>
 
 <style>
-    .fade-decoration {
-        position: absolute;
-        width: 100%;
-        margin-top: calc(100vw / 16 * 9 / 1.4);
-        height: calc(100vw / 16 * 9 - 100vw / 16 * 9 / 1.4);
-        background: -moz-linear-gradient(top, rgba(20,20,20,0), rgba(20,20,20, 1));
-        background: -webkit-linear-gradient(top, rgba(20,20,20,0), rgba(20,20,20, 1));
-    }
-
     #logo {
         position: absolute;
         width: 100%;
@@ -84,8 +73,24 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        aspect-ratio: 16 / 9;
         z-index: 0;
+    }
+
+    .trailer::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 0;
+        height: 30%;
+        background: linear-gradient(to bottom, rgb(20 20 20 / 0), rgb(20 20 20));
+        pointer-events: none;
+    }
+
+    .trailer video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .logo-dec {
