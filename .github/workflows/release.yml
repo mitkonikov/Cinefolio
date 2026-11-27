@@ -156,29 +156,3 @@ jobs:
 
           verify_tag
           gh api --method PATCH "$repository/releases/$release_id" -F draft=false --jq '.html_url'
-
-  retire-legacy:
-    if: github.ref_name == 'v0.1.3'
-    needs: publish
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      actions: write
-    steps:
-      - name: Retire superseded releases and build records
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          repository="repos/$GITHUB_REPOSITORY"
-          releases=$(gh api --paginate "$repository/releases?per_page=100" \
-            --jq '.[] | select(.tag_name == "v0.1.0" or .tag_name == "v0.1.1" or .tag_name == "v0.1.2") | .id')
-          runs=$(gh api --paginate "$repository/actions/workflows/release.yml/runs?event=push&per_page=100" \
-            --jq '.workflow_runs[] | select(.head_branch == "v0.1.0" or .head_branch == "v0.1.1" or .head_branch == "v0.1.2") | .id')
-          for id in $releases; do
-            gh api --method DELETE "$repository/releases/$id"
-          done
-          for id in $runs; do
-            gh api --method DELETE "$repository/actions/runs/$id"
-          done
