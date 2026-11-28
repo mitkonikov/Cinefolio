@@ -34,3 +34,10 @@ After dependency or migration work:
 - Backend (`go`):
   - `go test ./...`
   - `go build ./cmd/cinefolio`
+
+## Release compatibility
+
+- Use stable `vMAJOR.MINOR.PATCH` tags. Rollback is allowed only between releases with the same major and minor versions, such as `v1.4.3` and `v1.4.2`.
+- Every patch release, including `v0.x` patches, must leave SQLite migrations, the database schema, and the public API and ABI unchanged. The previous patch must be able to run against data and persistent state written by the new patch.
+- Use at least a minor version bump for SQLite migrations or compatibility changes. Use a major version bump for breaking public API or ABI changes in stable major versions.
+- Plan recovery separately for minor and major updates. Switching the application version does not restore its data.
